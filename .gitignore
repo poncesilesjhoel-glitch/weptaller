@@ -1,0 +1,14 @@
+# Configuración privada del backend (contraseñas y llaves de dLocal Go).
+# Copia api/config.example.php como api/config.php en el servidor y complétalo.
+api/config.php
+
+# Reservas y mensajes reales de clientes
+api/datos/*.json
+api/datos/*.log
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

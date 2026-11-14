@@ -1,0 +1,32 @@
+{
+  "_instrucciones": [
+    "Este archivo define los servicios que se pueden reservar y las reglas de la agenda.",
+    "Lo leen tanto el sitio (reservar.html, index.html, páginas legales) como el backend PHP (api/), así el precio no se puede alterar desde el navegador.",
+    "precio: costo total del servicio en la moneda configurada en assets/js/config.js (solo números, punto como decimal).",
+    "duracionMinutos: duración de cada turno en la agenda.",
+    "porcentajeAdelanto: porcentaje del precio que se cobra al reservar (el resto se paga en el taller).",
+    "horasCancelacion: con cuántas horas de anticipación el cliente puede cancelar y recuperar o reprogramar su adelanto.",
+    "diasLaborables: 1=lunes ... 5=viernes, 6=sábado, 0=domingo.",
+    "feriados: fechas sin atención en formato AAAA-MM-DD.",
+    "pausas: franjas sin turnos (por ejemplo, almuerzo).",
+    "Los JSON no admiten comentarios: por eso las instrucciones están en esta lista."
+  ],
+  "duracionMinutos": 60,
+  "porcentajeAdelanto": 30,
+  "horasCancelacion": 24,
+  "horaApertura": "08:00",
+  "horaCierre": "17:00",
+  "pausas": [{ "desde": "12:00", "hasta": "13:00" }],
+  "diasLaborables": [1, 2, 3, 4, 5],
+  "diasMaximosAnticipacion": 45,
+  "feriados": ["2026-12-25", "2027-01-01"],
+  "servicios": [
+    { "id": "revision", "nombre": "Revisión general", "precio": 40, "descripcion": "Inspección de 40 puntos: niveles, luces, llantas, frenos, suspensión y reporte escrito." },
+    { "id": "aceite", "nombre": "Cambio de aceite", "precio": 25, "descripcion": "Mano de obra de cambio de aceite y filtro, revisión de niveles y reinicio del indicador." },
+    { "id": "frenos", "nombre": "Frenos", "precio": 35, "descripcion": "Diagnóstico de pastillas, discos, líquido y mangueras. Incluye prueba de frenado." },
+    { "id": "suspension", "nombre": "Suspensión", "precio": 35, "descripcion": "Revisión de amortiguadores, rótulas, bujes y terminales de dirección." },
+    { "id": "bateria", "nombre": "Batería", "precio": 15, "descripcion": "Prueba de carga, alternador y sistema de arranque. Limpieza de bornes." },
+    { "id": "escaner", "nombre": "Escáner / diagnóstico", "precio": 30, "descripcion": "Lectura de códigos de falla con escáner, interpretación y presupuesto de reparación." },
+    { "id": "otro", "nombre": "Otro", "precio": 30, "descripcion": "Revisión de diagnóstico para cualquier otra falla. Cuéntanos qué le pasa a tu vehículo." }
+  ]
+}

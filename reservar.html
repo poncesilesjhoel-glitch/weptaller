@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reservar revisión en línea | TORKE</title>
+  <meta name="description" content="Agenda la revisión de tu vehículo en línea: elige el servicio, describe los síntomas, escoge fecha y hora y confirma con un adelanto seguro.">
+  <meta name="theme-color" content="#1a1033">
+  <link rel="icon" type="image/svg+xml" href="assets/img/logo-torke-icono.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>document.documentElement.classList.add("js");</script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/common.js" defer></script>
+  <script src="assets/js/reservar.js" defer></script>
+  <script src="assets/js/anim.js" defer></script>
+</head>
+<body class="oscuro">
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<!-- HEADER -->
+<header class="header">
+  <div class="contenedor header__fila">
+    <a class="marca" href="index.html" aria-label="TORKE, ir al inicio">
+      <img class="marca__logo" src="assets/img/logo-torke.svg" alt="TORKE" width="144" height="44">
+    </a>
+    <div class="header__acciones">
+      <nav id="nav" class="nav" aria-label="Menú principal">
+        <a href="index.html#beneficios">Beneficios</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="index.html#tienda">Tienda</a>
+        <a href="index.html#preguntas">Preguntas</a>
+        <a href="index.html#contacto">Contacto</a>
+        <a class="btn btn--primario" href="reservar.html" aria-current="page">Reservar revisión</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-controls="nav" aria-expanded="false" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<!-- /HEADER -->
+
+<main id="contenido">
+  <section class="pagina-cab">
+    <div class="contenedor">
+      <p class="migas"><a href="index.html">Inicio</a> › Reservar revisión</p>
+      <h1>Reserva tu revisión</h1>
+      <p>En 5 pasos y menos de 3 minutos. Confirmas con un adelanto del <span data-res="porcentajeAdelanto">30</span>% y el resto lo pagas en el taller.</p>
+    </div>
+  </section>
+
+  <section class="reserva">
+    <div class="contenedor">
+      <div id="flujo">
+        <ol class="pasos" id="indicador" aria-label="Progreso de la reserva">
+          <li class="activo">Servicio</li>
+          <li>Síntomas</li>
+          <li>Fecha y hora</li>
+          <li>Tus datos</li>
+          <li>Pago</li>
+        </ol>
+
+        <div class="reserva__layout">
+          <form id="form-reserva" novalidate>
+
+            <!-- Paso 1 -->
+            <fieldset class="paso activo" data-paso="1" style="border:0;padding:0;margin:0">
+              <legend class="sr-only">Paso 1: servicio</legend>
+              <h2 class="paso__titulo">¿Qué servicio necesitas?</h2>
+              <p class="paso__desc">El precio corresponde al costo de la revisión. Si se necesitan repuestos o reparaciones adicionales, te enviaremos un presupuesto para tu aprobación.</p>
+              <div class="opciones" id="servicios"></div>
+            </fieldset>
+
+            <!-- Paso 2 -->
+            <fieldset class="paso" data-paso="2" style="border:0;padding:0;margin:0">
+              <legend class="sr-only">Paso 2: síntomas</legend>
+              <h2 class="paso__titulo">¿Qué síntomas presenta tu vehículo?</h2>
+              <p class="paso__desc">Marca todos los que apliquen. Esto nos ayuda a preparar las herramientas y repuestos antes de que llegues. Es opcional.</p>
+              <div class="sintomas" id="sintomas"></div>
+              <div class="campo" id="otro-sintoma-campo" hidden style="margin-top:14px">
+                <label for="otro-sintoma">Describe el otro síntoma</label>
+                <textarea id="otro-sintoma" maxlength="500" placeholder="Ej.: se escucha un golpe al pasar por baches"></textarea>
+              </div>
+            </fieldset>
+
+            <!-- Paso 3 -->
+            <fieldset class="paso" data-paso="3" style="border:0;padding:0;margin:0">
+              <legend class="sr-only">Paso 3: fecha y hora</legend>
+              <h2 class="paso__titulo">Elige fecha y hora</h2>
+              <p class="paso__desc">Atendemos de lunes a viernes. Cada turno dura <span data-res="duracionMinutos">60</span> minutos. Las horas ya reservadas aparecen bloqueadas.</p>
+              <div class="agenda">
+                <div class="calendario">
+                  <div class="calendario__cab">
+                    <button type="button" id="mes-ant" aria-label="Mes anterior">‹</button>
+                    <h3 id="mes-titulo" aria-live="polite"></h3>
+                    <button type="button" id="mes-sig" aria-label="Mes siguiente">›</button>
+                  </div>
+                  <div class="calendario__grid" id="calendario"></div>
+                </div>
+                <div class="horas">
+                  <h3 id="horas-titulo">Selecciona un día</h3>
+                  <div class="horas__grid" id="horas" aria-live="polite"></div>
+                  <div class="leyenda"><span class="l-libre">Disponible</span><span class="l-ocupado">Ocupado</span><span class="l-sel">Seleccionado</span></div>
+                </div>
+              </div>
+            </fieldset>
+
+            <!-- Paso 4 -->
+            <fieldset class="paso" data-paso="4" style="border:0;padding:0;margin:0">
+              <legend class="sr-only">Paso 4: tus datos</legend>
+              <h2 class="paso__titulo">Tus datos y los de tu vehículo</h2>
+              <p class="paso__desc">Te enviaremos la confirmación de la reserva a tu correo.</p>
+              <div class="campos">
+                <div class="campo completo">
+                  <label for="r-nombre">Nombre completo <span class="req" aria-hidden="true">*</span></label>
+                  <input id="r-nombre" name="nombre" type="text" autocomplete="name" required maxlength="80">
+                </div>
+                <div class="campo">
+                  <label for="r-telefono">Teléfono / WhatsApp <span class="req" aria-hidden="true">*</span></label>
+                  <input id="r-telefono" name="telefono" type="tel" autocomplete="tel" required maxlength="20" inputmode="tel">
+                </div>
+                <div class="campo">
+                  <label for="r-correo">Correo electrónico <span class="req" aria-hidden="true">*</span></label>
+                  <input id="r-correo" name="correo" type="email" autocomplete="email" required maxlength="120">
+                </div>
+                <div class="campo">
+                  <label for="r-marca">Marca <span class="req" aria-hidden="true">*</span></label>
+                  <input id="r-marca" name="marca" type="text" required maxlength="40" placeholder="Ej.: Chevrolet">
+                </div>
+                <div class="campo">
+                  <label for="r-modelo">Modelo <span class="req" aria-hidden="true">*</span></label>
+                  <input id="r-modelo" name="modelo" type="text" required maxlength="40" placeholder="Ej.: Onix">
+                </div>
+                <div class="campo">
+                  <label for="r-anio">Año <span class="req" aria-hidden="true">*</span></label>
+                  <input id="r-anio" name="anio" type="number" required min="1950" max="2100" inputmode="numeric">
+                </div>
+                <div class="campo">
+                  <label for="r-placa">Placa <span class="req" aria-hidden="true">*</span></label>
+                  <input id="r-placa" name="placa" type="text" required maxlength="12" style="text-transform:uppercase" autocapitalize="characters">
+                </div>
+              </div>
+            </fieldset>
+
+            <!-- Paso 5 -->
+            <fieldset class="paso" data-paso="5" style="border:0;padding:0;margin:0">
+              <legend class="sr-only">Paso 5: pago del adelanto</legend>
+              <h2 class="paso__titulo">Confirma y paga el adelanto</h2>
+              <p class="paso__desc">Revisa el resumen. Para asegurar tu turno cobramos un adelanto del <span data-res="porcentajeAdelanto">30</span>% del costo de la revisión; el saldo se paga en el taller al recibir tu vehículo.</p>
+
+              <div class="politica" role="note">
+                <h4><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> Política de cancelación del adelanto</h4>
+                <p>Si cancelas o pides reprogramar con <strong>al menos <span data-res="horasCancelacion">24</span> horas de anticipación</strong>, puedes elegir entre la <strong>devolución total del adelanto</strong> o <strong>reprogramar tu cita sin costo</strong>.</p>
+                <p>Si cancelas con menos de <span data-res="horasCancelacion">24</span> horas o no te presentas, el adelanto no es reembolsable, pero puedes usarlo una vez para reprogramar dentro de los 30 días siguientes.</p>
+                <p>Detalles completos en la <a href="reembolsos.html" target="_blank" rel="noopener">Política de Devoluciones y Reembolsos</a>.</p>
+              </div>
+
+              <label class="check" style="margin-bottom:10px"><input type="checkbox" id="acepto-politica"> <span>Leí y acepto la política de cancelación, los <a href="terminos.html" target="_blank" rel="noopener">Términos y Condiciones</a> y la <a href="privacidad.html" target="_blank" rel="noopener">Política de Privacidad</a>.</span></label>
+              <p class="ayuda" style="font-size:.85rem;color:var(--texto-suave)">El pago se procesa de forma segura en dLocal Go. Nunca almacenamos los datos de tu tarjeta.</p>
+            </fieldset>
+
+            <div id="reserva-msg" role="alert" aria-live="assertive"></div>
+
+            <div class="nav-pasos">
+              <button type="button" class="btn btn--borde" id="btn-atras" hidden>← Atrás</button>
+              <button type="button" class="btn btn--primario" id="btn-siguiente">Continuar →</button>
+              <button type="button" class="btn btn--primario" id="btn-pagar" hidden>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                Pagar adelanto
+              </button>
+            </div>
+          </form>
+
+          <aside class="resumen" aria-labelledby="resumen-titulo">
+            <h3 id="resumen-titulo">Resumen de tu reserva</h3>
+            <dl id="resumen"></dl>
+          </aside>
+        </div>
+      </div>
+
+      <!-- Pantalla de reserva confirmada -->
+      <div id="confirmada" class="confirmada" hidden tabindex="-1">
+        <div class="confirmada__icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h2 id="conf-titulo">¡Reserva registrada!</h2>
+        <p id="conf-texto">Guarda tu código de reserva. Lo necesitarás para cualquier cambio o cancelación.</p>
+        <div class="codigo" id="conf-codigo"></div>
+        <div id="conf-pago"></div>
+        <div class="resumen"><dl id="conf-resumen"></dl></div>
+        <p id="conf-correo" class="actualizado"></p>
+        <div class="acciones">
+          <a class="btn btn--borde" href="#" id="conf-wa" hidden>Enviar reserva por WhatsApp</a>
+          <button type="button" class="btn btn--borde" onclick="window.print()">Imprimir comprobante</button>
+          <a class="btn btn--oscuro" href="index.html">Volver al inicio</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="contenedor">
+    <div class="footer__grid">
+      <div class="footer__identidad">
+        <a class="marca" href="index.html" aria-label="TORKE, ir al inicio">
+          <img class="marca__logo" src="assets/img/logo-torke.svg" alt="TORKE" width="163" height="50" loading="lazy">
+        </a>
+        <p><strong data-cfg="negocio.nombre">TORKE</strong></p>
+        <p data-cfg-si="negocio.titular">Titular: <span data-cfg="negocio.titular"></span></p>
+        <p data-cfg-si="negocio.nit">NIT/RUC: <span data-cfg="negocio.nit"></span></p>
+        <p data-cfg-si="negocio.direccion"><span data-cfg="negocio.direccion"></span></p>
+        <p data-cfg-si="negocio.ubicacion"><span data-cfg="negocio.ubicacion"></span></p>
+      </div>
+      <div>
+        <h3>Navegación</h3>
+        <ul>
+          <li><a href="index.html#beneficios">Beneficios</a></li>
+          <li><a href="index.html#servicios">Servicios</a></li>
+          <li><a href="index.html#tienda">Tienda</a></li>
+          <li><a href="reservar.html">Reservar revisión</a></li>
+          <li><a href="index.html#contacto">Contacto</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="terminos.html">Términos y Condiciones</a></li>
+          <li><a href="envios.html">Política de Envíos</a></li>
+          <li><a href="reembolsos.html">Devoluciones y Reembolsos</a></li>
+          <li><a href="privacidad.html">Política de Privacidad</a></li>
+          <li><a href="creditos.html">Créditos de imágenes</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contacto</h3>
+        <ul>
+          <li data-cfg-si="negocio.correo"><a href="#" data-cfg-link="correo"><span data-cfg="negocio.correo"></span></a></li>
+          <li data-cfg-si="negocio.whatsapp"><a href="#" data-cfg-link="whatsapp">WhatsApp <span data-cfg="negocio.whatsappFormato"></span></a></li>
+          <li><span data-cfg="negocio.horarioTexto">Lunes a viernes</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__base">
+      <span>© <span data-anio>2026</span> <span data-cfg="negocio.nombre">TORKE</span>. Todos los derechos reservados.</span>
+      <span>Pagos procesados de forma segura con dLocal Go.</span>
+    </div>
+  </div>
+</footer>
+<a class="wa-flotante" href="#" data-cfg-link="whatsapp" aria-label="Escríbenos por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.2-1.4A10 10 0 1 0 12 2zm5.5 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>
+</a>
+<!-- /FOOTER -->
+</body>
+</html>

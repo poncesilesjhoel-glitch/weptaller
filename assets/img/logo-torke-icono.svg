@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TORKE">
+  <defs>
+    <linearGradient id="fg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7b4dff"/><stop offset=".5" stop-color="#3a1f9e"/><stop offset="1" stop-color="#1546c9"/></linearGradient>
+    <linearGradient id="fn" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffb347"/><stop offset="1" stop-color="#ff5e1a"/></linearGradient>
+    <linearGradient id="fc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9d2ff"/></linearGradient>
+  </defs>
+  <path d="M32 5 55.4 18.5V45.5L32 59 8.6 45.5V18.5Z" fill="url(#fg)" stroke="url(#fg)" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M32 9.5 51.5 20.8V43.2L32 54.5 12.5 43.2V20.8Z" fill="none" stroke="#ffffff" stroke-opacity=".14" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M15.5 31A16.5 16.5 0 0 1 48.5 31" fill="none" stroke="url(#fn)" stroke-width="3.4" stroke-linecap="round"/>
+  <path d="M19.6 22.4l1.6 1.6M32 15.2v2.2M44.4 22.4l-1.6 1.6" stroke="#ffffff" stroke-opacity=".7" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M32 31.5 41 21.5" stroke="url(#fn)" stroke-width="2.6" stroke-linecap="round"/>
+  <g transform="translate(32 41.5) scale(.8) translate(-33 -36)">
+    <path fill="url(#fc)" d="M10 40c0-3.6 2-5.6 6-6.3l6.3-1.1 6-6.1c1.5-1.5 3-2 5-2h8.6c2 0 3.5.8 4.8 2.3l4.4 5.3c3.5.7 5 2.1 5 5.1V40a2 2 0 0 1-2 2h-2.4a5.4 5.4 0 0 0-10.7 0H25a5.4 5.4 0 0 0-10.7 0H12a2 2 0 0 1-2-2z"/>
+    <path fill="#3a1f9e" d="M29.7 27.9c.8-.8 1.7-1.2 2.9-1.2h4v5.4H25.8zM38.6 26.7h3.5c1.2 0 2 .4 2.8 1.3l3.4 4.1h-9.7z"/>
+    <circle cx="19.6" cy="42.4" r="4.6" fill="#140c2a"/><circle cx="19.6" cy="42.4" r="2.1" fill="#ff7a1a"/>
+    <circle cx="46.4" cy="42.4" r="4.6" fill="#140c2a"/><circle cx="46.4" cy="42.4" r="2.1" fill="#ff7a1a"/>
+  </g>
+  <circle cx="32" cy="31.5" r="2.4" fill="#ffffff"/>
+</svg>
