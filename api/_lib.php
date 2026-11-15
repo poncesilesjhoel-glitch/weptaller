@@ -74,8 +74,65 @@ function turnos(string $fecha): array {
     return $lista;
 }
 
-/** Abre el archivo de reservas con bloqueo exclusivo y ejecuta $fn. */
+/** Conexión a PostgreSQL si existe la variable DATABASE_URL (Render, Neon, Supabase…). */
+function bd(): ?PDO {
+    static $pdo = false;
+    if ($pdo !== false) return $pdo;
+    $url = getenv('DATABASE_URL') ?: '';
+    if ($url === '') return $pdo = null;
+    $u = parse_url($url);
+    parse_str($u['query'] ?? '', $q);
+    $dsn = sprintf('pgsql:host=%s;port=%d;dbname=%s;sslmode=%s', $u['host'], $u['port'] ?? 5432,
+        ltrim($u['path'] ?? '', '/'), $q['sslmode'] ?? 'prefer');
+    try {
+        $pdo = new PDO($dsn, urldecode($u['user'] ?? ''), urldecode($u['pass'] ?? ''), [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        ]);
+        $pdo->exec('CREATE TABLE IF NOT EXISTS torke_reservas (
+            id BIGSERIAL, codigo TEXT PRIMARY KEY, datos JSONB NOT NULL,
+            creada TIMESTAMPTZ NOT NULL DEFAULT now(), actualizada TIMESTAMPTZ NOT NULL DEFAULT now())');
+    } catch (Throwable $e) {
+        error_log('BD: ' . $e->getMessage());
+        responder(['ok' => false, 'error' => 'No se pudo conectar con la base de datos.'], 500);
+    }
+    return $pdo;
+}
+
+/** Carga las reservas (base de datos o archivo) con bloqueo y ejecuta $fn. */
 function conReservas(callable $fn, bool $escribir = false) {
+    $pdo = bd();
+    if ($pdo) {
+        try {
+            $pdo->beginTransaction();
+            // Bloqueo exclusivo para que dos clientes no tomen la misma hora
+            if ($escribir) $pdo->query('SELECT pg_advisory_xact_lock(7421001)');
+            $lista = [];
+            foreach ($pdo->query('SELECT datos FROM torke_reservas ORDER BY id') as $f) {
+                $lista[] = json_decode($f['datos'], true);
+            }
+            $antes = array_column($lista, 'codigo');
+            $resultado = $fn($lista);
+            if ($escribir) {
+                $ins = $pdo->prepare('INSERT INTO torke_reservas (codigo, datos) VALUES (?, ?::jsonb)
+                    ON CONFLICT (codigo) DO UPDATE SET datos = EXCLUDED.datos, actualizada = now()
+                    WHERE torke_reservas.datos IS DISTINCT FROM EXCLUDED.datos');
+                foreach ($lista as $r) $ins->execute([$r['codigo'], json_encode($r, JSON_UNESCAPED_UNICODE)]);
+                $borrar = array_diff($antes, array_column($lista, 'codigo'));
+                if ($borrar) {
+                    $del = $pdo->prepare('DELETE FROM torke_reservas WHERE codigo = ?');
+                    foreach ($borrar as $c) $del->execute([$c]);
+                }
+            }
+            $pdo->commit();
+            return $resultado;
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            error_log('BD: ' . $e->getMessage());
+            responder(['ok' => false, 'error' => 'Error en la base de datos.'], 500);
+        }
+    }
+
+    // Sin base de datos: archivo api/datos/reservas.json (hosting PHP tradicional)
     if (!is_dir(__DIR__ . '/datos')) mkdir(__DIR__ . '/datos', 0750, true);
     $fp = fopen(ARCHIVO_RESERVAS, 'c+');
     if (!$fp) responder(['ok' => false, 'error' => 'No se puede escribir en api/datos/. Revisa los permisos.'], 500);

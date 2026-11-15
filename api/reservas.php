@@ -19,7 +19,7 @@ $accion = (string)($in['accion'] ?? '');
 switch ($accion) {
 
     case 'ping':
-        responder(['ok' => true]);
+        responder(['ok' => true, 'almacen' => bd() ? 'base de datos' : 'archivo']);
 
     case 'ocupados':
         $fecha = texto($in['fecha'] ?? '', 10);
