@@ -790,11 +790,6 @@ body.oscuro { background: var(--noche-0); color: var(--texto-claro); }
 .js .titulo-anim .w { opacity: 0; transform: translateY(.6em) rotateX(60deg); filter: blur(6px); transition: opacity .7s, transform .7s cubic-bezier(.2,.8,.2,1), filter .7s; transition-delay: calc(var(--wi) * 70ms); }
 .js .visible .titulo-anim .w, .js .titulo-anim.visible .w { opacity: 1; transform: none; filter: none; }
 
-/* ---------- Luz que sigue al cursor (escritorio) ---------- */
-.cursor-luz { position: fixed; left: 0; top: 0; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%; pointer-events: none; z-index: 0;
-  background: radial-gradient(circle, rgba(123,77,255,.16), rgba(255,106,26,.06) 40%, transparent 65%); transition: opacity .4s; mix-blend-mode: screen; }
-.cursor-punto { position: fixed; left: 0; top: 0; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 1.5px solid rgba(255,179,71,.7); pointer-events: none; z-index: 999; transition: width .25s, height .25s, margin .25s, background .25s, border-color .25s; }
-.cursor-punto.activo { width: 64px; height: 64px; margin: -32px 0 0 -32px; background: rgba(255,106,26,.12); border-color: var(--naranja-vivo); }
 
 /* ---------- Pantalla de entrada: tacómetro ---------- */
 .intro { background: radial-gradient(circle at 50% 45%, #1c1150, #07051a 70%); }
@@ -1003,10 +998,9 @@ body.oscuro { background: var(--noche-0); color: var(--texto-claro); }
 
 @media (prefers-reduced-motion: reduce) {
   .js .titulo-anim .w { opacity: 1 !important; transform: none !important; filter: none !important; }
-  .cursor-luz, .cursor-punto, .chispas { display: none !important; }
+  .chispas { display: none !important; }
   .medidor .valor { stroke-dashoffset: calc(251.3 - 251.3 * var(--p)) !important; }
 }
-@media (hover: none), (max-width: 920px) { .cursor-luz, .cursor-punto { display: none; } }
 /* v3: ajustes de color y bordes suaves */
 .oscuro .nav a:not(.btn) { color: #e8e4f6; }
 .oscuro .nav a:not(.btn):hover, .oscuro .nav a.activo { color: #fff; }

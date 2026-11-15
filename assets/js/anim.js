@@ -158,7 +158,7 @@
 })();
 
 /* =====================================================================
-   v3 — Efectos avanzados: chispas, cursor, foco, 3D, magnetismo,
+   v3 — Efectos avanzados: chispas, foco, 3D, magnetismo,
    títulos animados, palabras rotativas y parallax.
    ===================================================================== */
 (function () {
@@ -243,25 +243,6 @@
   }, { passive: true });
 
   if (!escritorio) return;
-
-  /* ---------- Cursor con luz ---------- */
-  var luz = document.createElement("div"); luz.className = "cursor-luz"; luz.setAttribute("aria-hidden", "true");
-  var punto = document.createElement("div"); punto.className = "cursor-punto"; punto.setAttribute("aria-hidden", "true");
-  if (document.body.classList.contains("oscuro")) document.body.appendChild(luz);
-  document.body.appendChild(punto);
-  var mx = innerWidth / 2, my = innerHeight / 2, lx = mx, ly = my, px = mx, py = my;
-  document.addEventListener("pointermove", function (e) { mx = e.clientX; my = e.clientY; }, { passive: true });
-  document.addEventListener("pointerover", function (e) {
-    punto.classList.toggle("activo", !!(e.target.closest && e.target.closest("a, button, summary, input, select, textarea, label, .producto, .servicio-card")));
-  });
-  document.addEventListener("pointerleave", function () { punto.style.opacity = "0"; luz.style.opacity = "0"; });
-  document.addEventListener("pointerenter", function () { punto.style.opacity = "1"; luz.style.opacity = "1"; });
-  (function seguir() {
-    lx += (mx - lx) * .08; ly += (my - ly) * .08; px += (mx - px) * .35; py += (my - py) * .35;
-    luz.style.transform = "translate(" + lx + "px," + ly + "px)";
-    punto.style.transform = "translate(" + px + "px," + py + "px)";
-    requestAnimationFrame(seguir);
-  })();
 
   /* ---------- Inclinación 3D ---------- */
   document.addEventListener("pointermove", function (e) {
