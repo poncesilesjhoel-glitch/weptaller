@@ -22,7 +22,7 @@ window.TALLER_CONFIG = {
     correo: "",                    // Correo de contacto (también recibe las reservas)
     whatsapp: "",                  // Solo números con código de país. Ej.: "573001234567"
     horarioTexto: "Lunes a viernes, de 8:00 a 17:00",
-    dominio: ""                    // Ej.: "https://www.tutaller.com" (para enlaces en correos)
+    dominio: "https://taller.poncesiles.com"                 // Ej.: "https://www.tutaller.com" (para enlaces en correos)
   },
 
   /* ---------- 2. Moneda y formato ---------- */
