@@ -1,0 +1,6 @@
+.git
+.gitignore
+Dockerfile
+.dockerignore
+api/config.php
+api/datos/*.json
