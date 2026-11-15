@@ -16,13 +16,13 @@
     horaApertura: "08:00", horaCierre: "17:00", pausas: [{ desde: "12:00", hasta: "13:00" }],
     diasLaborables: [1, 2, 3, 4, 5], diasMaximosAnticipacion: 45, feriados: [],
     servicios: [
-      { id: "revision", nombre: "Revisión general", precio: 40, descripcion: "Inspección de 40 puntos con reporte escrito." },
-      { id: "aceite", nombre: "Cambio de aceite", precio: 25, descripcion: "Cambio de aceite y filtro, revisión de niveles." },
-      { id: "frenos", nombre: "Frenos", precio: 35, descripcion: "Diagnóstico de pastillas, discos y líquido." },
-      { id: "suspension", nombre: "Suspensión", precio: 35, descripcion: "Amortiguadores, rótulas, bujes y terminales." },
-      { id: "bateria", nombre: "Batería", precio: 15, descripcion: "Prueba de carga, alternador y arranque." },
-      { id: "escaner", nombre: "Escáner / diagnóstico", precio: 30, descripcion: "Lectura de códigos de falla con escáner." },
-      { id: "otro", nombre: "Otro", precio: 30, descripcion: "Revisión de diagnóstico para cualquier otra falla." }
+      { id: "revision", nombre: "Revisión general", precio: 280, descripcion: "Inspección de 40 puntos con reporte escrito." },
+      { id: "aceite", nombre: "Cambio de aceite", precio: 150, descripcion: "Cambio de aceite y filtro, revisión de niveles." },
+      { id: "frenos", nombre: "Frenos", precio: 200, descripcion: "Diagnóstico de pastillas, discos y líquido." },
+      { id: "suspension", nombre: "Suspensión", precio: 200, descripcion: "Amortiguadores, rótulas, bujes y terminales." },
+      { id: "bateria", nombre: "Batería", precio: 100, descripcion: "Prueba de carga, alternador y arranque." },
+      { id: "escaner", nombre: "Escáner / diagnóstico", precio: 200, descripcion: "Lectura de códigos de falla con escáner." },
+      { id: "otro", nombre: "Otro", precio: 180, descripcion: "Revisión de diagnóstico para cualquier otra falla." }
     ]
   };
 
@@ -45,7 +45,7 @@
 
   function moneda(valor) {
     try {
-      return new Intl.NumberFormat(CFG.locale || "es", { style: "currency", currency: CFG.moneda || "USD", maximumFractionDigits: 2 }).format(valor);
+      return new Intl.NumberFormat(CFG.locale || "es", { style: "currency", currency: CFG.moneda || "BOB", minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(valor);
     } catch (e) {
       return (CFG.moneda || "") + " " + Number(valor).toFixed(2);
     }
@@ -75,7 +75,7 @@
     raiz.querySelectorAll("[data-cfg-si]").forEach(function (el) {
       var k = el.getAttribute("data-cfg-si");
       var v = k in extra ? extra[k] : obtener(k, CFG);
-      if (!v) el.hidden = true;
+      el.hidden = !v;
     });
     raiz.querySelectorAll("[data-cfg-link]").forEach(function (el) {
       var tipo = el.getAttribute("data-cfg-link");
@@ -84,6 +84,7 @@
       if (tipo === "correo" && N.correo) href = "mailto:" + N.correo;
       if (tipo === "mapa" && N.direccion) href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(N.direccion + " " + ubicacion());
       if (href) {
+        el.hidden = false;
         el.setAttribute("href", href);
         if (tipo !== "correo") { el.setAttribute("target", "_blank"); el.setAttribute("rel", "noopener"); }
       } else {
@@ -95,17 +96,35 @@
     raiz.querySelectorAll("[data-dinero]").forEach(function (el) { el.textContent = moneda(+el.getAttribute("data-dinero")); });
   }
 
-  /* ---------- Configuración de reservas ---------- */
-  var promesaReservas = null;
-  function cargarReservas() {
-    if (!promesaReservas) {
-      promesaReservas = fetch("reservas.json", { cache: "no-cache" })
-        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-        .then(function (d) { return Object.assign({}, RESERVAS_DEFECTO, d); })
-        .catch(function () { return RESERVAS_DEFECTO; });
-    }
-    return promesaReservas;
+  /* ---------- Datos del sitio (panel admin → api/publico.php) ----------
+     Con backend: negocio, servicios, agenda, catálogo y métodos de pago
+     vienen de lo que guardas en el panel. Sin backend: reservas.json y
+     productos.json. */
+  function leerJson(url) {
+    return fetch(url, { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
   }
+  var promesaDatos = null;
+  function cargarDatos() {
+    if (!promesaDatos) {
+      var desdeApi = CFG.API_URL
+        ? fetch(CFG.API_URL + "publico.php", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+        : Promise.resolve(null);
+      promesaDatos = desdeApi.then(function (d) {
+        if (d && d.ok) {
+          Object.keys(d.negocio || {}).forEach(function (k) { if (d.negocio[k]) N[k] = d.negocio[k]; });
+          return { api: true, reglas: Object.assign({}, RESERVAS_DEFECTO, d.reglas), catalogo: d.catalogo, pagos: d.pagos || { metodos: [] } };
+        }
+        return Promise.all([
+          leerJson("reservas.json").catch(function () { return {}; }),
+          leerJson("productos.json").catch(function () { return null; })
+        ]).then(function (r) {
+          return { api: false, reglas: Object.assign({}, RESERVAS_DEFECTO, r[0]), catalogo: r[1], pagos: { metodos: [] } };
+        });
+      });
+    }
+    return promesaDatos;
+  }
+  function cargarReservas() { return cargarDatos().then(function (d) { return d.reglas; }); }
 
   function rellenarReservas() {
     if (!document.querySelector("[data-res]")) return;
@@ -118,29 +137,49 @@
   }
 
   /* ---------- Backend (PHP) con detección automática ---------- */
-  var promesaApi = null;
   function apiDisponible() {
-    if (!CFG.API_URL) return Promise.resolve(false);
-    if (!promesaApi) {
-      promesaApi = fetch(CFG.API_URL + "reservas.php?accion=ping", { cache: "no-store" })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (d) { return !!(d && d.ok); })
-        .catch(function () { return false; });
-    }
-    return promesaApi;
+    return cargarDatos().then(function (d) { return d.api; });
   }
 
+  var tokenAdmin = "";
   function api(archivo, datos, metodo) {
     var url = CFG.API_URL + archivo;
     var opciones = { method: metodo || "POST", headers: { "Content-Type": "application/json" }, cache: "no-store" };
+    if (tokenAdmin) opciones.headers["X-Token"] = tokenAdmin;
     if (opciones.method === "GET") {
       if (datos) url += (url.indexOf("?") > -1 ? "&" : "?") + new URLSearchParams(datos).toString();
-      delete opciones.headers;
+      if (!tokenAdmin) delete opciones.headers;
     } else {
       opciones.body = JSON.stringify(datos || {});
     }
     return fetch(url, opciones).then(function (r) {
       return r.json().catch(function () { return { ok: false, error: "Respuesta no válida del servidor." }; });
+    });
+  }
+
+  /* Reduce una foto en el navegador antes de subirla (máx. lado en px). */
+  function comprimirImagen(archivo, lado, calidad) {
+    return new Promise(function (ok, mal) {
+      if (!archivo || !/^image\//.test(archivo.type)) { mal(new Error("Elige una imagen JPG, PNG o WebP.")); return; }
+      var lector = new FileReader();
+      lector.onerror = function () { mal(new Error("No se pudo leer la imagen.")); };
+      lector.onload = function () {
+        var img = new Image();
+        img.onerror = function () { mal(new Error("La imagen no es válida.")); };
+        img.onload = function () {
+          var max = lado || 900, w = img.naturalWidth, h = img.naturalHeight, f = Math.min(1, max / Math.max(w, h));
+          var c = document.createElement("canvas");
+          c.width = Math.round(w * f); c.height = Math.round(h * f);
+          var ctx = c.getContext("2d");
+          ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+          ctx.drawImage(img, 0, 0, c.width, c.height);
+          var url = c.toDataURL("image/webp", calidad || 0.85);
+          if (url.indexOf("data:image/webp") !== 0) url = c.toDataURL("image/jpeg", calidad || 0.85);
+          ok(url);
+        };
+        img.src = lector.result;
+      };
+      lector.readAsDataURL(archivo);
     });
   }
 
@@ -182,13 +221,14 @@
 
   window.TY = {
     cfg: CFG, negocio: N, moneda: moneda, escapar: escapar, enlaceWhatsApp: enlaceWhatsApp,
-    ubicacion: ubicacion, cargarReservas: cargarReservas, apiDisponible: apiDisponible, api: api,
-    aviso: aviso, rellenarConfig: rellenarConfig
+    ubicacion: ubicacion, cargarReservas: cargarReservas, cargarDatos: cargarDatos, apiDisponible: apiDisponible, api: api,
+    aviso: aviso, rellenarConfig: rellenarConfig, comprimirImagen: comprimirImagen,
+    usarToken: function (t) { tokenAdmin = t || ""; }
   };
 
   document.addEventListener("DOMContentLoaded", function () {
     rellenarConfig();
-    rellenarReservas();
     iniciarMenu();
+    cargarDatos().then(function () { rellenarConfig(); rellenarReservas(); });
   });
 })();

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Tu pedido | TORKE</title>
+  <meta name="description" content="Estado y pago de tu pedido en la tienda TORKE.">
+  <meta name="theme-color" content="#1a1033">
+  <link rel="icon" type="image/svg+xml" href="assets/img/logo-torke-icono.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>document.documentElement.classList.add("js");</script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/common.js" defer></script>
+  <script src="assets/js/pagos.js" defer></script>
+  <script src="assets/js/pedido.js" defer></script>
+  <script src="assets/js/anim.js" defer></script>
+</head>
+<body class="oscuro">
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<!-- HEADER -->
+<header class="header">
+  <div class="contenedor header__fila">
+    <a class="marca" href="index.html" aria-label="TORKE, ir al inicio">
+      <img class="marca__logo" src="assets/img/logo-torke.svg" alt="TORKE" width="144" height="44">
+    </a>
+    <div class="header__acciones">
+      <nav id="nav" class="nav" aria-label="Menú principal">
+        <a href="index.html#beneficios">Beneficios</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="index.html#tienda">Tienda</a>
+        <a href="index.html#preguntas">Preguntas</a>
+        <a href="index.html#contacto">Contacto</a>
+        <a class="btn btn--primario" href="reservar.html">Reservar revisión</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-controls="nav" aria-expanded="false" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<!-- /HEADER -->
+
+<main id="contenido">
+  <section class="pagina-cab">
+    <div class="contenedor">
+      <p class="migas"><a href="index.html">Inicio</a> › <a href="index.html#tienda">Tienda</a> › Tu pedido</p>
+      <h1>Tu pedido</h1>
+      <p>Revisa el detalle y paga con QR o tarjeta. Guarda tu código de pedido.</p>
+    </div>
+  </section>
+
+  <section class="reserva">
+    <div class="contenedor">
+      <div id="pedido" class="confirmada" tabindex="-1">
+        <p class="vacio" id="pedido-cargando">Cargando tu pedido…</p>
+        <div id="pedido-contenido" hidden>
+          <div class="confirmada__icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg></div>
+          <h2 id="pedido-titulo">Pedido registrado</h2>
+          <div class="codigo" id="pedido-codigo"></div>
+          <div id="pedido-pago"></div>
+          <div class="resumen"><dl id="pedido-resumen"></dl></div>
+          <div class="acciones">
+            <a class="btn btn--borde" href="#" id="pedido-wa" hidden>Consultar por WhatsApp</a>
+            <button type="button" class="btn btn--borde" onclick="window.print()">Imprimir comprobante</button>
+            <a class="btn btn--oscuro" href="index.html#tienda">Seguir comprando</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="contenedor">
+    <div class="footer__grid">
+      <div class="footer__identidad">
+        <a class="marca" href="index.html" aria-label="TORKE, ir al inicio">
+          <img class="marca__logo" src="assets/img/logo-torke.svg" alt="TORKE" width="163" height="50" loading="lazy">
+        </a>
+        <p><strong data-cfg="negocio.nombre">TORKE</strong></p>
+        <p data-cfg-si="negocio.titular">Titular: <span data-cfg="negocio.titular"></span></p>
+        <p data-cfg-si="negocio.nit">NIT/RUC: <span data-cfg="negocio.nit"></span></p>
+        <p data-cfg-si="negocio.direccion"><span data-cfg="negocio.direccion"></span></p>
+        <p data-cfg-si="negocio.ubicacion"><span data-cfg="negocio.ubicacion"></span></p>
+      </div>
+      <div>
+        <h3>Navegación</h3>
+        <ul>
+          <li><a href="index.html#beneficios">Beneficios</a></li>
+          <li><a href="index.html#servicios">Servicios</a></li>
+          <li><a href="index.html#tienda">Tienda</a></li>
+          <li><a href="reservar.html">Reservar revisión</a></li>
+          <li><a href="index.html#contacto">Contacto</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="terminos.html">Términos y Condiciones</a></li>
+          <li><a href="envios.html">Política de Envíos</a></li>
+          <li><a href="reembolsos.html">Devoluciones y Reembolsos</a></li>
+          <li><a href="privacidad.html">Política de Privacidad</a></li>
+          <li><a href="creditos.html">Créditos de imágenes</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contacto</h3>
+        <ul>
+          <li data-cfg-si="negocio.correo"><a href="#" data-cfg-link="correo"><span data-cfg="negocio.correo"></span></a></li>
+          <li data-cfg-si="negocio.whatsapp"><a href="#" data-cfg-link="whatsapp">WhatsApp <span data-cfg="negocio.whatsappFormato"></span></a></li>
+          <li><span data-cfg="negocio.horarioTexto">Lunes a viernes</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__base">
+      <span>© <span data-anio>2026</span> <span data-cfg="negocio.nombre">TORKE</span>. Todos los derechos reservados.</span>
+      <span>Pagos seguros con QR y tarjeta (dLocal Go).</span>
+    </div>
+  </div>
+</footer>
+<a class="wa-flotante" href="#" data-cfg-link="whatsapp" aria-label="Escríbenos por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.2-1.4A10 10 0 1 0 12 2zm5.5 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>
+</a>
+<!-- /FOOTER -->
+</body>
+</html>

@@ -1,13 +1,12 @@
 <?php
 /* =====================================================================
    API de reservas
-   GET  ?accion=ping                     -> comprueba que el backend funciona
+   GET  ?accion=ping                      -> comprueba que el backend funciona
    GET  ?accion=ocupados&fecha=AAAA-MM-DD -> horas ya reservadas
-   GET  ?accion=consultar&codigo=TK-XXX  -> estado público de una reserva
-   POST {accion:"crear", ...}            -> crea una reserva y envía correos
-   POST {accion:"listar", clave}         -> (admin) lista todas las reservas
-   POST {accion:"estado", clave, codigo, estado} -> (admin) confirmar/cancelar
-   POST {accion:"pagado", clave, codigo, pagado}  -> (admin) marcar adelanto pagado
+   GET  ?accion=consultar&codigo=TK-XXX   -> estado público de una reserva
+   POST {accion:"crear", ...}             -> crea una reserva y envía correos
+   POST {accion:"estado", codigo, estado} -> (panel) confirmar/cancelar
+   POST {accion:"pagado", codigo, pagado} -> (panel) marcar adelanto pagado
    ===================================================================== */
 declare(strict_types=1);
 require __DIR__ . '/_lib.php';
@@ -15,6 +14,33 @@ require __DIR__ . '/_lib.php';
 $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $in = $metodo === 'POST' ? entrada() : $_GET;
 $accion = (string)($in['accion'] ?? '');
+
+/** Turnos válidos de una fecha (vacío si el día no es hábil). */
+function aMin(string $h): int { [$a, $b] = array_map('intval', explode(':', $h . ':0')); return $a * 60 + $b; }
+function aHora(int $m): string { return sprintf('%02d:%02d', intdiv($m, 60), $m % 60); }
+function turnos(string $fecha): array {
+    $R = reglas();
+    $d = DateTime::createFromFormat('!Y-m-d', $fecha);
+    if (!$d || $d->format('Y-m-d') !== $fecha) return [];
+    $hoy = new DateTime('today');
+    $limite = (clone $hoy)->modify('+' . (int)($R['diasMaximosAnticipacion'] ?? 45) . ' days');
+    if ($d < $hoy || $d > $limite) return [];
+    if (!in_array((int)$d->format('w'), array_map('intval', $R['diasLaborables']), true)) return [];
+    if (in_array($fecha, $R['feriados'] ?? [], true)) return [];
+    $dur = max(15, (int)$R['duracionMinutos']);
+    $ini = aMin($R['horaApertura']); $fin = aMin($R['horaCierre']);
+    $esHoy = $fecha === $hoy->format('Y-m-d');
+    $ahora = (int)date('G') * 60 + (int)date('i') + 60;
+    $lista = [];
+    for ($m = $ini; $m + $dur <= $fin; $m += $dur) {
+        foreach ($R['pausas'] ?? [] as $p) {
+            if ($m < aMin($p['hasta']) && $m + $dur > aMin($p['desde'])) continue 2;
+        }
+        if ($esHoy && $m < $ahora) continue;
+        $lista[] = aHora($m);
+    }
+    return $lista;
+}
 
 switch ($accion) {
 
@@ -31,13 +57,9 @@ switch ($accion) {
         responder(['ok' => true, 'horas' => array_values(array_unique($horas))]);
 
     case 'consultar':
-        $codigo = strtoupper(texto($in['codigo'] ?? '', 12));
-        $r = conReservas(function (array $l) use ($codigo) {
-            foreach ($l as $x) if ($x['codigo'] === $codigo) return $x;
-            return null;
-        });
+        $r = buscarRegistro('reservas', strtoupper(texto($in['codigo'] ?? '', 12)));
         if (!$r) responder(['ok' => false, 'error' => 'Reserva no encontrada.'], 404);
-        responder(['ok' => true, 'reserva' => publica($r)]);
+        responder(['ok' => true, 'reserva' => publica($r), 'metodos' => metodosPago()]);
 
     case 'crear':
         if ($metodo !== 'POST') responder(['ok' => false, 'error' => 'Método no permitido.'], 405);
@@ -72,20 +94,14 @@ switch ($accion) {
             'sintomas' => $sintomas, 'otroSintoma' => texto($in['otroSintoma'] ?? '', 500),
             'fecha' => $fecha, 'hora' => $hora, 'cliente' => $cliente, 'vehiculo' => $vehiculo,
             'precio' => $precio, 'porcentaje' => $porcentaje, 'adelanto' => round($precio * $porcentaje / 100, 2),
-            'estado' => 'pendiente', 'pagado' => false, 'pagoId' => '', 'creada' => date('c'),
+            'estado' => 'pendiente', 'pagado' => false, 'pagoReportado' => false, 'creada' => date('c'),
         ];
 
         $resultado = conReservas(function (array &$l) use (&$reserva) {
             foreach ($l as $x) {
                 if ($x['fecha'] === $reserva['fecha'] && $x['hora'] === $reserva['hora'] && $x['estado'] !== 'cancelada') return false;
             }
-            $abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            $existentes = array_column($l, 'codigo');
-            do {
-                $cod = 'TK-';
-                for ($i = 0; $i < 6; $i++) $cod .= $abc[random_int(0, strlen($abc) - 1)];
-            } while (in_array($cod, $existentes, true));
-            $reserva['codigo'] = $cod;
+            $reserva['codigo'] = codigoNuevo('TK-', array_column($l, 'codigo'));
             $l[] = $reserva;
             return true;
         }, true);
@@ -95,30 +111,25 @@ switch ($accion) {
         $politica = '<p style="font-size:13px;color:#5b5670">Política: si cancelas o reprogramas con al menos ' . $horas
             . ' horas de anticipación, te devolvemos el adelanto o reprogramamos sin costo. Con menos de ' . $horas
             . ' horas el adelanto no es reembolsable, pero puedes usarlo una vez para reprogramar dentro de 30 días.</p>';
-        $enlace = $CONFIG['sitio_url'] ? '<p><a href="' . htmlspecialchars($CONFIG['sitio_url']) . '/reservar.html?codigo=' . $reserva['codigo'] . '">Ver mi reserva</a></p>' : '';
+        $enlace = '<p><a href="' . htmlspecialchars(urlBase()) . '/reservar.html?codigo=' . $reserva['codigo'] . '">Ver mi reserva y pagar</a></p>';
+        $taller = correoTaller();
 
         $okCliente = enviarCorreo($cliente['correo'], 'Reserva ' . $reserva['codigo'] . ' registrada',
             '<p>Hola ' . htmlspecialchars($cliente['nombre']) . ',</p><p>Registramos tu reserva. Para confirmarla, paga el adelanto de <b>'
-            . dinero($reserva['adelanto']) . '</b>. El saldo se paga en el taller.</p>' . tablaReserva($reserva) . $enlace . $politica,
-            $CONFIG['correo_taller']);
-        if ($CONFIG['correo_taller']) {
-            enviarCorreo($CONFIG['correo_taller'], 'Nueva reserva ' . $reserva['codigo'] . ' – ' . $fecha . ' ' . $hora,
+            . dinero($reserva['adelanto']) . '</b>. El saldo se paga en el taller.</p>' . tablaReserva($reserva) . $enlace . $politica, $taller);
+        if ($taller) {
+            enviarCorreo($taller, 'Nueva reserva ' . $reserva['codigo'] . ' – ' . $fecha . ' ' . $hora,
                 '<p>Nueva reserva recibida desde el sitio web.</p>' . tablaReserva($reserva)
-                . '<p>Gestiónala en el panel: ' . htmlspecialchars($CONFIG['sitio_url']) . '/admin.html</p>', $cliente['correo']);
+                . '<p>Gestiónala en el panel: ' . htmlspecialchars(urlBase()) . '/admin.html</p>', $cliente['correo']);
         }
-        responder(['ok' => true, 'reserva' => publica($reserva), 'correoEnviado' => $okCliente]);
-
-    case 'listar':
-        verificarAdmin($in);
-        $l = conReservas(fn(array $l) => $l);
-        responder(['ok' => true, 'reservas' => $l]);
+        responder(['ok' => true, 'reserva' => publica($reserva), 'metodos' => metodosPago(), 'correoEnviado' => $okCliente]);
 
     case 'estado':
     case 'pagado':
-        verificarAdmin($in);
+        verificarSesion($in);
         $codigo = texto($in['codigo'] ?? '', 12);
         $nuevo = texto($in['estado'] ?? '', 12);
-        if ($accion === 'estado' && !in_array($nuevo, ['pendiente', 'confirmada', 'cancelada'], true)) {
+        if ($accion === 'estado' && !in_array($nuevo, ['pendiente', 'confirmada', 'cancelada', 'completada'], true)) {
             responder(['ok' => false, 'error' => 'Estado no válido.'], 422);
         }
         $r = conReservas(function (array &$l) use ($codigo, $accion, $nuevo, $in) {
@@ -126,12 +137,13 @@ switch ($accion) {
                 if ($x['codigo'] !== $codigo) continue;
                 if ($accion === 'estado') {
                     if ($nuevo !== 'cancelada' && $x['estado'] === 'cancelada') {
-                        // Reactivar solo si la hora sigue libre
                         foreach ($l as $y) if ($y['codigo'] !== $codigo && $y['fecha'] === $x['fecha'] && $y['hora'] === $x['hora'] && $y['estado'] !== 'cancelada') return 'ocupada';
                     }
                     $x['estado'] = $nuevo;
                 } else {
                     $x['pagado'] = (bool)($in['pagado'] ?? false);
+                    if ($x['pagado'] && empty($x['pago'])) $x['pago'] = ['metodo' => 'manual', 'referencia' => 'Marcado en el panel', 'monto' => $x['adelanto'], 'fecha' => date('c')];
+                    if ($x['pagado'] && $x['estado'] === 'pendiente') $x['estado'] = 'confirmada';
                 }
                 $x['actualizada'] = date('c');
                 return $x;
@@ -142,12 +154,13 @@ switch ($accion) {
         if (!$r) responder(['ok' => false, 'error' => 'Reserva no encontrada.'], 404);
 
         $correo = false;
+        $taller = correoTaller();
         if ($accion === 'estado' && $nuevo === 'confirmada') {
             $correo = enviarCorreo($r['cliente']['correo'], 'Reserva ' . $r['codigo'] . ' confirmada',
-                '<p>Hola ' . htmlspecialchars($r['cliente']['nombre']) . ', tu reserva está <b>confirmada</b>. ¡Te esperamos!</p>' . tablaReserva($r), $CONFIG['correo_taller']);
+                '<p>Hola ' . htmlspecialchars($r['cliente']['nombre']) . ', tu reserva está <b>confirmada</b>. ¡Te esperamos!</p>' . tablaReserva($r), $taller);
         } elseif ($accion === 'estado' && $nuevo === 'cancelada') {
             $correo = enviarCorreo($r['cliente']['correo'], 'Reserva ' . $r['codigo'] . ' cancelada',
-                '<p>Hola ' . htmlspecialchars($r['cliente']['nombre']) . ', tu reserva fue <b>cancelada</b>. Si pagaste un adelanto, te contactaremos para la devolución o reprogramación según nuestra política.</p>' . tablaReserva($r), $CONFIG['correo_taller']);
+                '<p>Hola ' . htmlspecialchars($r['cliente']['nombre']) . ', tu reserva fue <b>cancelada</b>. Si pagaste un adelanto, te contactaremos para la devolución o reprogramación según nuestra política.</p>' . tablaReserva($r), $taller);
         }
         responder(['ok' => true, 'correoEnviado' => $correo]);
 

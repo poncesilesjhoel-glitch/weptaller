@@ -1,8 +1,8 @@
 {
   "_instrucciones": [
     "Este archivo define los servicios que se pueden reservar y las reglas de la agenda.",
-    "Lo leen tanto el sitio (reservar.html, index.html, páginas legales) como el backend PHP (api/), así el precio no se puede alterar desde el navegador.",
-    "precio: costo total del servicio en la moneda configurada en assets/js/config.js (solo números, punto como decimal).",
+    "Son los valores iniciales: después se editan desde el panel admin (admin.html › Servicios y agenda). Lo leen tanto el sitio (reservar.html, index.html, páginas legales) como el backend PHP (api/), así el precio no se puede alterar desde el navegador.",
+    "precio: costo total del servicio en bolivianos (Bs) (solo números, punto como decimal).",
     "duracionMinutos: duración de cada turno en la agenda.",
     "porcentajeAdelanto: porcentaje del precio que se cobra al reservar (el resto se paga en el taller).",
     "horasCancelacion: con cuántas horas de anticipación el cliente puede cancelar y recuperar o reprogramar su adelanto.",
@@ -21,12 +21,12 @@
   "diasMaximosAnticipacion": 45,
   "feriados": ["2026-12-25", "2027-01-01"],
   "servicios": [
-    { "id": "revision", "nombre": "Revisión general", "precio": 40, "descripcion": "Inspección de 40 puntos: niveles, luces, llantas, frenos, suspensión y reporte escrito." },
-    { "id": "aceite", "nombre": "Cambio de aceite", "precio": 25, "descripcion": "Mano de obra de cambio de aceite y filtro, revisión de niveles y reinicio del indicador." },
-    { "id": "frenos", "nombre": "Frenos", "precio": 35, "descripcion": "Diagnóstico de pastillas, discos, líquido y mangueras. Incluye prueba de frenado." },
-    { "id": "suspension", "nombre": "Suspensión", "precio": 35, "descripcion": "Revisión de amortiguadores, rótulas, bujes y terminales de dirección." },
-    { "id": "bateria", "nombre": "Batería", "precio": 15, "descripcion": "Prueba de carga, alternador y sistema de arranque. Limpieza de bornes." },
-    { "id": "escaner", "nombre": "Escáner / diagnóstico", "precio": 30, "descripcion": "Lectura de códigos de falla con escáner, interpretación y presupuesto de reparación." },
-    { "id": "otro", "nombre": "Otro", "precio": 30, "descripcion": "Revisión de diagnóstico para cualquier otra falla. Cuéntanos qué le pasa a tu vehículo." }
+    { "id": "revision", "nombre": "Revisión general", "precio": 280, "descripcion": "Inspección de 40 puntos: niveles, luces, llantas, frenos, suspensión y reporte escrito." },
+    { "id": "aceite", "nombre": "Cambio de aceite", "precio": 150, "descripcion": "Mano de obra de cambio de aceite y filtro, revisión de niveles y reinicio del indicador." },
+    { "id": "frenos", "nombre": "Frenos", "precio": 200, "descripcion": "Diagnóstico de pastillas, discos, líquido y mangueras. Incluye prueba de frenado." },
+    { "id": "suspension", "nombre": "Suspensión", "precio": 200, "descripcion": "Revisión de amortiguadores, rótulas, bujes y terminales de dirección." },
+    { "id": "bateria", "nombre": "Batería", "precio": 100, "descripcion": "Prueba de carga, alternador y sistema de arranque. Limpieza de bornes." },
+    { "id": "escaner", "nombre": "Escáner / diagnóstico", "precio": 200, "descripcion": "Lectura de códigos de falla con escáner, interpretación y presupuesto de reparación." },
+    { "id": "otro", "nombre": "Otro", "precio": 180, "descripcion": "Revisión de diagnóstico para cualquier otra falla. Cuéntanos qué le pasa a tu vehículo." }
   ]
 }

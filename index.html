@@ -593,10 +593,25 @@
       <button class="cerrar" type="button" data-cerrar-carrito aria-label="Cerrar carrito">×</button>
     </div>
     <ul class="carrito__lista" id="carrito-lista"></ul>
+    <form class="carrito__checkout" id="checkout" hidden novalidate>
+      <button type="button" class="btn btn--borde btn--sm" id="checkout-volver">← Volver al carrito</button>
+      <h3>Datos para tu pedido</h3>
+      <div class="campo"><label for="ck-nombre">Nombre completo <span class="req" aria-hidden="true">*</span></label><input id="ck-nombre" name="nombre" autocomplete="name" maxlength="80" required></div>
+      <div class="campo"><label for="ck-telefono">Teléfono / WhatsApp <span class="req" aria-hidden="true">*</span></label><input id="ck-telefono" name="telefono" type="tel" autocomplete="tel" maxlength="20" required></div>
+      <div class="campo"><label for="ck-correo">Correo electrónico <span class="req" aria-hidden="true">*</span></label><input id="ck-correo" name="correo" type="email" autocomplete="email" maxlength="120" required></div>
+      <fieldset class="campo ck-entrega">
+        <legend>Entrega</legend>
+        <label class="check"><input type="radio" name="entrega" value="retiro" checked> <span>Retiro en el taller (sin costo)</span></label>
+        <label class="check"><input type="radio" name="entrega" value="envio"> <span>Envío a domicilio (el costo se coordina según tu zona)</span></label>
+      </fieldset>
+      <div class="campo" id="ck-direccion-campo" hidden><label for="ck-direccion">Dirección de envío <span class="req" aria-hidden="true">*</span></label><input id="ck-direccion" name="direccion" autocomplete="street-address" maxlength="200"></div>
+      <div class="campo"><label for="ck-nota">Nota (opcional)</label><textarea id="ck-nota" name="nota" maxlength="500" placeholder="Marca y modelo de tu vehículo, horario de entrega…"></textarea></div>
+      <div id="checkout-msg" role="alert"></div>
+    </form>
     <div class="carrito__pie">
       <div class="carrito__total"><span>Total</span><span id="carrito-total">0</span></div>
       <p class="carrito__nota">Los costos de envío se calculan según tu zona. Consulta la <a href="envios.html">Política de Envíos</a>.</p>
-      <button class="btn btn--primario btn--bloque" type="button" id="carrito-finalizar">Finalizar pedido por WhatsApp</button>
+      <button class="btn btn--primario btn--bloque" type="button" id="carrito-finalizar">Finalizar pedido</button>
       <button class="btn btn--borde btn--bloque" type="button" id="carrito-vaciar" style="margin-top:10px">Vaciar carrito</button>
     </div>
   </aside>
@@ -647,7 +662,7 @@
     </div>
     <div class="footer__base">
       <span>© <span data-anio>2026</span> <span data-cfg="negocio.nombre">TORKE</span>. Todos los derechos reservados.</span>
-      <span>Pagos procesados de forma segura con dLocal Go.</span>
+      <span>Pagos seguros con QR y tarjeta (dLocal Go).</span>
     </div>
   </div>
 </footer>

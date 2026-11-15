@@ -1,166 +1,122 @@
-# TORKE: sitio web con reservas y tienda
+# TORKE: sitio web con reservas, tienda y panel de administración
 
-Sitio en HTML, CSS y JavaScript puros (sin frameworks), responsive, con:
+Sitio en HTML, CSS y JavaScript puros (sin frameworks) con backend PHP y precios en **bolivianos (Bs)**:
 
-- Página principal con hero, beneficios, servicios, tienda con carrito y contacto.
-- Sistema de reservas en 5 pasos con calendario, horas bloqueadas y adelanto pagado con **dLocal Go**.
-- Panel `admin.html` protegido con contraseña para ver, confirmar o cancelar reservas.
+- Página principal con hero animado, beneficios, servicios, tienda con carrito y contacto.
+- Reservas en 5 pasos: servicio, síntomas, calendario con horas bloqueadas, datos y pago del adelanto.
+- Tienda con carrito, checkout y página de pedido (`pedido.html`).
+- Pagos en línea con **QR Simple del BNB** (pagable desde cualquier banco), **tarjeta con dLocal Go** y, como respaldo, el **QR fijo** de tu cuenta.
+- **Panel `admin.html`** con usuario y contraseña propios: reservas, pedidos, catálogo con fotos, servicios y precios, horarios, medios de pago y datos del negocio.
 - Páginas legales completas: términos, envíos, reembolsos y privacidad.
-- Backend PHP opcional (`api/`) para guardar reservas en el servidor y enviar correos.
+
+Publicado en Render: <https://taller.poncesiles.com>
 
 ---
 
-## 1. Estructura
+## 1. Panel de administración
+
+Entra a `https://taller.poncesiles.com/admin.html`.
+
+**Primer ingreso:** usuario `admin` y la clave inicial (variable `ADMIN_CLAVE` en Render, o `admin_clave` en `api/config.php`). El panel te pide crear tu propio usuario y contraseña; desde ese momento la clave inicial deja de funcionar. Puedes cambiarlos cuando quieras en **Mi cuenta**.
+
+| Pestaña | Qué haces ahí |
+|---|---|
+| **Reservas** | Ver, confirmar, completar o cancelar citas; marcar adelantos pagados; ver comprobantes; exportar a CSV. |
+| **Pedidos** | Pedidos de la tienda: estado (pagado, en preparación, enviado, entregado), pagos y comprobantes. |
+| **Catálogo** | Agregar, editar y eliminar productos, cambiar precios, subir fotos, marcar agotados y administrar categorías. |
+| **Servicios y agenda** | Servicios reservables y sus precios, horario, duración del turno, pausa, días de atención, feriados, % de adelanto y horas para cancelar. |
+| **Pagos** | Conectar el QR del BNB, dLocal Go y el QR fijo. Botón **Probar conexión** para cada uno. |
+| **Negocio** | Nombre, titular, NIT, ciudad, dirección, correo, WhatsApp y horario que se muestran en todo el sitio. |
+
+Todo lo que guardas en el panel se ve en el sitio al instante, sin tocar código.
+
+## 2. Pagos
+
+### QR Simple del BNB
+
+1. Pide a tu ejecutivo del BNB el acceso a la **API QR Simple (Open Banking)**. Te entregan un `accountId` y un `authorizationId`, primero de pruebas y luego de producción.
+2. En **Panel › Pagos › QR Simple — BNB** pégalos, elige el entorno (pruebas o producción), marca **Activar** y pulsa **Probar conexión**.
+3. Si el BNB te pide una URL de notificación, registra la que muestra el panel: `https://taller.poncesiles.com/api/webhook-bnb.php`. Es opcional: mientras el cliente tiene el QR abierto, el sitio consulta el estado cada 5 segundos.
+
+Para cada reserva o pedido, el sitio genera un QR de un solo uso por el monto exacto. Cuando el cliente paga desde la app de su banco, la reserva se confirma sola y llegan los correos.
+
+> Endpoints usados: `POST /ClientAuthentication.API/api/v1/auth/token`, `POST /QRSimple.API/api/v1/main/getQRWithImageAsync` y `POST /QRSimple.API/api/v1/main/getQRStatusAsync` sobre `https://test.bnb.com.bo` (pruebas) o `https://marketapi.bnb.com.bo` (producción). Si el BNB te indica otra dirección, ponla en el campo **URL base** del panel. El código está en `api/_lib.php` (funciones `bnb…`).
+
+### Tarjeta con dLocal Go
+
+1. Cuando tu cuenta de dLocal Go esté aprobada, ve a **Integraciones › API** y copia la **API Key** y la **Secret Key**.
+2. En **Panel › Pagos › Tarjeta — dLocal Go** pégalas, deja **sandbox** marcado para probar, elige la moneda de cobro (BOB, o USD con conversión según el tipo de cambio) y pulsa **Probar conexión**.
+3. Cuando todo funcione, desmarca **sandbox** y pon las llaves de producción.
+
+El cliente paga en el checkout seguro de dLocal Go y vuelve al sitio. dLocal Go avisa a `api/webhook-dlocal.php`; el servidor consulta el pago a la API (no confía en el aviso) y, si el estado es `PAID` y el monto es correcto, lo marca como pagado.
+
+### QR fijo (respaldo)
+
+En **Panel › Pagos › QR fijo** sube la imagen del QR de cobro de tu cuenta. El cliente paga, adjunta su comprobante y tú lo verificas y marcas como pagado en **Reservas** o **Pedidos**.
+
+Si no hay ningún medio activo, la reserva queda apartada y el sitio indica que coordinarás el pago.
+
+Las llaves secretas se guardan en la base de datos y el panel solo muestra los últimos 4 caracteres.
+
+## 3. Estructura
 
 ```
 /
-├── index.html            Página principal (una sola página con menú fijo)
-├── reservar.html         Sistema de reservas
-├── admin.html            Panel de reservas (privado)
-├── terminos.html  envios.html  reembolsos.html  privacidad.html
-├── creditos.html         Autores y licencias de las fotos
-├── productos.json        ← Catálogo de la tienda (editable)
-├── reservas.json         ← Servicios, precios, horario y reglas de la agenda (editable)
-├── robots.txt  .htaccess
+├── index.html  reservar.html  pedido.html  admin.html
+├── terminos.html  envios.html  reembolsos.html  privacidad.html  creditos.html
+├── productos.json  reservas.json   Valores iniciales (luego se editan en el panel)
+├── Dockerfile                      PHP 8.3 + Apache para Render
 ├── assets/
 │   ├── css/styles.css
-│   ├── img/logo-torke.svg         Logo completo para fondos oscuros (menú, pie, entrada)
-│   ├── img/logo-torke-oscuro.svg  Logo completo para fondos claros
-│   ├── img/logo-torke-icono.svg   Ícono (favicon, hero y app)
-│   ├── img/productos/                Fotos reales de productos (WebP)
-│   ├── img/fotos/                    Fotos reales del hero, servicios y banda de reserva
+│   ├── img/                        Logo, fotos reales y productos
 │   └── js/
-│       ├── config.js     ← DATOS DEL NEGOCIO (edítalo primero)
-│       ├── common.js  inicio.js  tienda.js  reservar.js  admin.js
-│       └── anim.js       Animaciones: entrada, scroll, contadores, botones
-└── api/                  Backend PHP (opcional, recomendado)
-    ├── config.php        ← Contraseña admin, correos y llaves de dLocal Go (privado)
-    ├── config.example.php ← Plantilla de config.php (la que se sube a git)
-    ├── reservas.php  pago.php  webhook-dlocal.php  contacto.php  _lib.php
-    └── datos/            Aquí se guardan las reservas (protegido)
+│       ├── config.js               Datos base del negocio, moneda y backend
+│       ├── common.js               Datos del sitio, formato Bs, utilidades
+│       ├── pagos.js                Pantalla de pago (QR BNB, tarjeta, QR fijo)
+│       ├── reservar.js  tienda.js  pedido.js  admin.js  inicio.js  anim.js
+└── api/
+    ├── _lib.php                    Base de datos, ajustes, sesión, BNB y dLocal
+    ├── publico.php                 Datos públicos (negocio, catálogo, servicios, pagos)
+    ├── admin.php                   API del panel
+    ├── reservas.php  pedidos.php  pago.php  imagen.php  contacto.php
+    ├── webhook-bnb.php  webhook-dlocal.php
+    └── config.example.php          Plantilla de configuración (copia como config.php)
 ```
 
-## 2. Antes de publicar: los 4 archivos que debes editar
+## 4. Dónde se guardan los datos
 
-| Archivo | Qué contiene |
+- **En Render:** en PostgreSQL, a través de la variable `DATABASE_URL`. Las tablas son `torke_reservas`, `torke_pedidos`, `torke_ajustes` (panel, catálogo, pagos y cuenta) y `torke_imagenes` (fotos subidas).
+- **En un hosting PHP sin base de datos:** en archivos dentro de `api/datos/`, protegidos por `.htaccess`.
+
+> ⚠️ La base `ponceshop-db` del plan gratis de Render vence el **20 de noviembre de 2026**. Antes de esa fecha, pásala a un plan de pago o cambia `DATABASE_URL` por otra base PostgreSQL (por ejemplo Neon, gratis).
+
+## 5. Variables de entorno (Render)
+
+| Variable | Para qué |
 |---|---|
-| `assets/js/config.js` | Nombre, titular, NIT/RUC, país, ciudad, dirección, correo, WhatsApp, moneda y enlace de pago de dLocal Go. **Los campos vacíos se ocultan en el sitio**, así que no habrá textos de ejemplo visibles, pero la identidad del pie de página quedará incompleta hasta que los llenes. |
-| `reservas.json` | Servicios y precios, duración del turno (60 min), % de adelanto (30 %), horas de anticipación para cancelar (24 h), horario, pausa de almuerzo, días laborables y feriados. |
-| `productos.json` | Productos de la tienda (las instrucciones están dentro del archivo). |
-| `api/config.php` | Contraseña del panel, correo del taller, zona horaria y llaves de dLocal Go. |
+| `DATABASE_URL` | Conexión a PostgreSQL. |
+| `ADMIN_CLAVE` | Clave inicial del panel (solo para el primer ingreso). |
+| `SITIO_URL` | `https://taller.poncesiles.com`, usada en correos y para volver de los pagos. |
+| `CORREO_REMITENTE`, `CORREO_TALLER` | Correos (opcional; el correo del taller también se edita en el panel). |
+| `DLOCAL_API_KEY`, `DLOCAL_SECRET_KEY`, `DLOCAL_SANDBOX` | Opcional; lo recomendado es cargarlas desde el panel. |
 
-> Los JSON no admiten comentarios: las instrucciones están en la clave `_instrucciones`, que el sitio ignora. Después de editarlos, valídalos en <https://jsonlint.com>.
+## 6. Publicar cambios
 
-**Contraseña inicial del panel:** `CambiaEstaClave2026`. Cámbiala en `api/config.php` (con backend) y en `ADMIN_PASSWORD_SHA256` de `config.js` (modo local: genera la huella en admin.html › «Generar huella»).
+Render publica la rama `main` de GitHub. Para subir cambios: `git add -A`, `git commit -m "..."`, `git push` y luego **Manual Deploy** en Render (o conecta GitHub en Render para que se publique solo).
 
-Al entrar en `admin.html`, el panel muestra en amarillo la lista de datos que aún faltan en la configuración.
+En otro hosting con PHP 8 y Apache, sube todo a `public_html/`, copia `api/config.example.php` como `api/config.php`, complétalo y da permisos de escritura a `api/datos/`.
 
-## 3. Probar en tu computador
+## 7. Correos
 
-Los archivos `.json` no cargan si abres el HTML con doble clic. Usa un servidor local:
+Con un servidor de correo disponible se envían avisos al crear una reserva o pedido, al recibir el pago y al confirmar, cancelar o enviar desde el panel. **Render no incluye servidor de correo**, así que ahí `mail()` no envía nada. Para activarlos, conecta un servicio SMTP o de API (Resend, Brevo) reemplazando `enviarCorreo()` en `api/_lib.php`.
 
-```bash
-# Con Python
-python -m http.server 8000
-# o, si tienes PHP instalado (así también funciona el backend):
-php -S localhost:8000
-```
+## 8. Seguridad
 
-Abre <http://localhost:8000>.
+- La contraseña del panel se guarda con `password_hash`, y las sesiones usan un token firmado que vence a las 12 horas.
+- El servidor recalcula precios, totales y disponibilidad: el cliente no puede alterar montos desde el navegador.
+- Los pagos solo se marcan como pagados después de consultar al BNB o a dLocal Go con tus credenciales.
+- `admin.html` y `pedido.html` están excluidos de los buscadores.
 
-## 4. Productos y fotos
+## 9. Fotos y créditos
 
-1. Sube tus fotos a `assets/img/productos/` (JPG/WEBP, unos 600×600 px, menos de 150 KB).
-2. En `productos.json`, copia un bloque `{ ... }`, cambia `id`, `nombre`, `categoria`, `precio`, `descripcion`, `foto` y `disponible`.
-3. Categorías válidas: `repuestos`, `aceites`, `filtros`, `frenos`, `baterias`, `llantas`, `accesorios`.
-
-El carrito se guarda en el navegador del cliente. «Finalizar pedido» envía el detalle al WhatsApp del taller (o por correo si no hay WhatsApp), donde se confirma la compatibilidad, el envío y el pago.
-
-### Fotos reales y créditos
-
-Las fotos de productos y servicios son fotografías reales con licencia libre (dominio público, CC BY y CC BY-SA) de Wikimedia Commons. Las recorté y optimicé en WebP. La licencia exige mencionar a los autores, y eso está en `creditos.html`, enlazada desde el pie de página.
-
-Cuando tengas fotos propias de tu taller y de tus productos, reemplaza los archivos en `assets/img/productos/` y `assets/img/fotos/` con el mismo nombre (o cambia la ruta en `productos.json`) y actualiza o elimina `creditos.html`.
-
-## 5. Publicar en tu dominio propio
-
-### Opción A (recomendada): hosting con PHP (cPanel, Hostinger, Banahosting, SiteGround, etc.)
-
-1. Contrata un hosting con PHP 7.4 o superior (casi todos lo incluyen) y conecta tu dominio. Si compraste el dominio en otro proveedor, cambia sus **DNS** a los que te indique el hosting.
-2. Activa el **certificado SSL gratuito** (Let's Encrypt / AutoSSL) en el panel del hosting.
-3. Sube **todo el contenido** de esta carpeta a `public_html/` con el Administrador de archivos o por FTP (FileZilla). Incluye los archivos ocultos `.htaccess`.
-4. Asegúrate de que la carpeta `api/datos/` tenga permisos de escritura (755 o 775).
-5. Copia `api/config.example.php` como `api/config.php` (este último no se sube a git) y edítalo: `admin_clave`, `correo_taller`, `correo_remitente` (por ejemplo `no-responder@tudominio.com`, créalo en el hosting), `sitio_url` (`https://www.tudominio.com`) y `zona_horaria`.
-6. Cuando el SSL funcione, descomenta el bloque «Fuerza HTTPS» en `.htaccess`.
-7. Prueba: haz una reserva, revisa que lleguen los correos y entra a `https://tudominio.com/admin.html`.
-
-**Si los correos no llegan o caen en spam:** usa un remitente de tu propio dominio y activa SPF/DKIM en el panel del hosting (sección «Email Deliverability» o «Autenticación de correo»). La función `enviarCorreo()` de `api/_lib.php` usa `mail()` de PHP; si prefieres SMTP, puedes reemplazarla por PHPMailer.
-
-### Opción B: hosting estático sin PHP (Netlify, GitHub Pages, Cloudflare Pages)
-
-El sitio funciona igual, pero en **modo local**:
-
-- Las reservas se guardan en el navegador del cliente, y la pantalla de confirmación ofrece enviarlas al taller por **WhatsApp**.
-- Las horas bloqueadas solo reflejan las reservas hechas desde ese mismo navegador: **no evitan reservas duplicadas entre clientes**.
-- El panel admin solo ve las reservas de ese navegador.
-- No se envían correos automáticos.
-
-Para un negocio real, la **opción A** es la recomendada. En modo estático puedes dejar `API_URL: "api/"`: el sitio detecta que no hay PHP y cambia solo al modo local. También puedes ponerlo en `""`.
-
-Netlify: arrastra la carpeta a <https://app.netlify.com/drop> y luego, en *Domain settings*, agrega tu dominio.
-
-## 6. Conectar dLocal Go
-
-Crea tu cuenta en <https://dlocalgo.com> y completa la verificación del negocio.
-
-### Opción 1: link de pago fijo (sin programar)
-
-1. En el panel de dLocal Go crea un **Link de pago**. Puede ser de monto abierto o con el monto del adelanto.
-2. Pega la URL en `assets/js/config.js`:
-   ```js
-   DLOCAL_PAYMENT_URL: "https://checkout.dlocalgo.com/...",
-   ```
-3. En la confirmación, el cliente verá «Pagar adelanto en dLocal Go» y se le pedirá indicar su código de reserva.
-4. Verifica el pago en dLocal Go y márcalo en `admin.html` con **Marcar pagado** y **Confirmar** (el cliente recibe un correo).
-
-### Opción 2: checkout automático con el monto exacto (requiere la opción A de hosting)
-
-1. En dLocal Go ve a **Integraciones › API** y copia tu **API Key** y tu **Secret Key**.
-2. Pégalas en `api/config.php`:
-   ```php
-   'dlocal_api_key'    => 'TU_API_KEY',
-   'dlocal_secret_key' => 'TU_SECRET_KEY',
-   'dlocal_sandbox'    => true,   // false en producción
-   'moneda' => 'COP', 'pais' => 'CO',
-   ```
-3. Al pulsar «Pagar adelanto», `api/pago.php` crea un pago por el monto exacto del adelanto, con el código de reserva como `order_id`, y redirige al checkout.
-4. Al terminar el pago, el cliente vuelve a `reservar.html?codigo=...&pago=ok`.
-5. dLocal Go notifica a `https://tudominio.com/api/webhook-dlocal.php`. El servidor **consulta el pago a la API** (no confía en la notificación recibida) y, si su estado es `PAID` y el monto es correcto, marca la reserva como pagada y confirmada y envía los correos.
-6. Prueba primero con `dlocal_sandbox => true` y las tarjetas de prueba de dLocal Go; luego cambia a `false` con las llaves de producción.
-
-> La integración usa `POST /v1/payments` y `GET /v1/payments/{id}` con la cabecera `Authorization: Bearer API_KEY:SECRET_KEY`. Si dLocal Go cambia su API, revisa su documentación oficial (<https://docs.dlocalgo.com>) y ajusta `api/pago.php` y `api/webhook-dlocal.php`.
-
-Si las llaves están vacías, el sitio usa automáticamente el link fijo de la opción 1.
-
-## 7. Correos de reservas
-
-Con el backend PHP se envían automáticamente:
-
-- **Al crear la reserva:** un correo al cliente (resumen, adelanto y política de cancelación) y otro al taller.
-- **Al confirmar o cancelar desde el panel:** un aviso al cliente.
-- **Al recibir el pago (webhook):** una confirmación al cliente y al taller.
-
-## 8. Personalización rápida
-
-- **Colores:** variables al inicio de `assets/css/styles.css` (`--morado-800`, `--azul-800`, `--naranja`…).
-- **Logo:** el logo (auto + nombre) está en `assets/img/logo-torke*.svg`, con las letras convertidas en trazos para que se vea igual en cualquier dispositivo. Para cambiarlo, reemplaza esos tres archivos con el mismo nombre.
-- **Animaciones:** se definen en `assets/js/anim.js` y en la sección «REDISEÑO v2» de `styles.css`. La pantalla de entrada se muestra solo la primera vez en cada sesión, y todas las animaciones se desactivan si el sistema del usuario tiene activado «reducir movimiento».
-- **Horario:** `horaApertura`, `horaCierre`, `pausas`, `diasLaborables` y `feriados` en `reservas.json`, más `horarioTexto` en `config.js`.
-- **Envíos:** costos y zonas en `envios.html`. Los montos `data-dinero="4"` se muestran con la moneda configurada.
-
-## 9. Seguridad y privacidad
-
-- Las contraseñas y llaves secretas solo van en `api/config.php`, nunca en `config.js`, que es público.
-- `api/datos/` y `api/config.php` están bloqueados con `.htaccess`. Si tu servidor es **Nginx**, agrega una regla equivalente (`location ^~ /api/datos/ { deny all; }`).
-- El backend vuelve a validar en el servidor el servicio, el precio, la fecha, el horario y la disponibilidad, así que un cliente no puede alterar el monto del adelanto desde el navegador.
-- `admin.html` está excluido de buscadores (`noindex` y `robots.txt`).
+Las fotos son reales, con licencia libre, de Wikimedia Commons; los autores figuran en `creditos.html`. Desde el panel puedes reemplazar las fotos de productos por fotos propias.

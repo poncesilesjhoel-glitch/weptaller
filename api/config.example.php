@@ -12,7 +12,7 @@ return [
     'admin_clave' => getenv('ADMIN_CLAVE') ?: 'CambiaEstaClave2026',
 
     // Zona horaria del taller: https://www.php.net/manual/es/timezones.america.php
-    'zona_horaria' => 'America/Bogota',
+    'zona_horaria' => 'America/La_Paz',
 
     // Datos para los correos (deben coincidir con assets/js/config.js).
     'negocio_nombre' => 'TORKE',
@@ -21,8 +21,8 @@ return [
     'sitio_url'      => getenv('SITIO_URL') ?: '',                        // Ej.: https://www.tudominio.com (sin / final)
 
     // Moneda y país para dLocal Go (código ISO de 2 letras del país).
-    'moneda' => 'USD',
-    'pais'   => 'CO',
+    'moneda' => 'BOB',
+    'pais'   => 'BO',
 
     /* ---------- dLocal Go (opción B: checkout automático) ----------
        Obtén tus llaves en el panel de dLocal Go > Integraciones > API.

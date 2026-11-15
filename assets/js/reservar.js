@@ -268,23 +268,13 @@
       }
       var reserva = r.reserva;
       try { sessionStorage.setItem("torke_ultima", JSON.stringify(reserva)); } catch (e) { /* nada */ }
-      return urlDePago(reserva).then(function (url) { mostrarConfirmacion(reserva, url, r); });
+      try { history.replaceState(null, "", "reservar.html?codigo=" + encodeURIComponent(reserva.codigo)); } catch (e) { /* nada */ }
+      mostrarConfirmacion(reserva, r.metodos || [], r);
     }).catch(function () {
       msg("Error de conexión. Revisa tu internet e inténtalo de nuevo.");
     }).then(function () {
       boton.disabled = false; boton.innerHTML = textoOriginal;
     });
-  }
-
-  function urlDePago(reserva) {
-    var fija = TY.cfg.DLOCAL_PAYMENT_URL || "";
-    if (!hayApi) return Promise.resolve(fija ? { url: fija, tipo: "enlace" } : null);
-    return TY.api("pago.php", { codigo: reserva.codigo })
-      .then(function (p) {
-        if (p.ok && p.url) return { url: p.url, tipo: "checkout" };
-        return fija ? { url: fija, tipo: "enlace" } : null;
-      })
-      .catch(function () { return fija ? { url: fija, tipo: "enlace" } : null; });
   }
 
   function filasConfirmacion(x) {
@@ -302,7 +292,7 @@
     return filas;
   }
 
-  function mostrarConfirmacion(x, pago, respuesta) {
+  function mostrarConfirmacion(x, metodos, respuesta) {
     $("flujo").hidden = true;
     var c = $("confirmada");
     c.hidden = false;
@@ -311,18 +301,32 @@
       return "<div><dt>" + TY.escapar(f[0]) + "</dt><dd>" + TY.escapar(f[1]) + "</dd></div>";
     }).join("");
 
-    var pagoHtml = "";
-    if (x.pagado) {
+    var cont = $("conf-pago");
+    function confirmadaOk() {
       $("conf-titulo").textContent = "¡Reserva confirmada!";
-      pagoHtml = '<p class="mensaje mensaje--ok">Recibimos el pago de tu adelanto. ¡Te esperamos!</p>';
-    } else if (pago) {
-      pagoHtml = '<p class="mensaje mensaje--info">Tu turno queda apartado. Para confirmarlo, paga el adelanto de <strong>' + TY.moneda(x.adelanto) +
-        '</strong>' + (pago.tipo === "enlace" ? " e indica tu código <strong>" + TY.escapar(x.codigo) + "</strong> en el pago" : "") + ".</p>" +
-        '<p><a class="btn btn--primario" href="' + TY.escapar(pago.url) + '"' + (pago.tipo === "enlace" ? ' target="_blank" rel="noopener"' : "") + '>Pagar adelanto en dLocal Go</a></p>';
-    } else {
-      pagoHtml = '<p class="mensaje mensaje--info">Tu turno queda apartado. Te contactaremos para coordinar el pago del adelanto de <strong>' + TY.moneda(x.adelanto) + "</strong>.</p>";
+      cont.innerHTML = '<p class="mensaje mensaje--ok">Recibimos el pago de tu adelanto. ¡Te esperamos!</p>';
     }
-    $("conf-pago").innerHTML = pagoHtml;
+    if (x.estado === "cancelada" || x.estado === "cancelado") {
+      $("conf-titulo").textContent = "Reserva cancelada";
+      cont.innerHTML = '<p class="mensaje mensaje--error">Esta reserva fue cancelada. Si necesitas ayuda, escríbenos.</p>';
+    } else if (x.pagado) {
+      confirmadaOk();
+    } else if (x.pagoReportado) {
+      cont.innerHTML = '<p class="mensaje mensaje--info">Recibimos tu aviso de pago. Lo estamos verificando y te confirmaremos pronto.</p>';
+    } else if (hayApi) {
+      cont.innerHTML = '<p class="conf-pago__titulo">Tu turno queda apartado. <strong>Paga el adelanto para confirmarlo:</strong></p><div id="conf-pago-caja"></div>';
+      TY.cargarDatos().then(function (d) {
+        TY.pagos.mostrar($("conf-pago-caja"), {
+          tipo: "reserva", codigo: x.codigo, monto: x.adelanto, metodos: metodos, qrFijo: d.pagos && d.pagos.qrFijo,
+          alPagar: confirmadaOk
+        });
+      });
+    } else {
+      var fija = TY.cfg.DLOCAL_PAYMENT_URL || "";
+      cont.innerHTML = fija
+        ? '<p class="mensaje mensaje--info">Para confirmar tu turno, paga el adelanto de <strong>' + TY.moneda(x.adelanto) + "</strong> e indica tu código <strong>" + TY.escapar(x.codigo) + '</strong>.</p><p><a class="btn btn--primario" href="' + TY.escapar(fija) + '" target="_blank" rel="noopener">Pagar adelanto</a></p>'
+        : '<p class="mensaje mensaje--info">Tu turno queda apartado. Te contactaremos para coordinar el pago del adelanto de <strong>' + TY.moneda(x.adelanto) + "</strong>.</p>";
+    }
 
     if (respuesta && respuesta.local) {
       $("conf-correo").textContent = "Envía la reserva al taller por WhatsApp para que la registremos y te confirmemos.";
@@ -343,7 +347,7 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  /* Al volver de dLocal Go: reservar.html?codigo=TK-XXXXXX&pago=ok */
+  /* Ver una reserva o volver del pago: reservar.html?codigo=TK-XXXXXX[&pago=ok] */
   function revisarRetorno() {
     var p = new URLSearchParams(location.search);
     var codigo = p.get("codigo");
@@ -351,14 +355,23 @@
     var guardada = null;
     try { guardada = JSON.parse(sessionStorage.getItem("torke_ultima")); } catch (e) { /* nada */ }
     var obtener = hayApi
-      ? TY.api("reservas.php", { accion: "consultar", codigo: codigo }, "GET").then(function (r) { return r.ok ? r.reserva : null; })
-      : Promise.resolve(guardada && guardada.codigo === codigo ? guardada : null);
-    obtener.then(function (x) {
-      if (!x) return;
-      mostrarConfirmacion(x, null, null);
+      ? TY.api("reservas.php", { accion: "consultar", codigo: codigo }, "GET").then(function (r) { return r.ok ? r : null; })
+      : Promise.resolve(guardada && guardada.codigo === codigo ? { reserva: guardada, metodos: [] } : null);
+    obtener.then(function (r) {
+      if (!r) return;
+      var x = r.reserva;
       if (!x.pagado && p.get("pago") === "ok") {
-        $("conf-pago").innerHTML = '<p class="mensaje mensaje--info">Estamos verificando tu pago con dLocal Go. Recibirás un correo cuando quede confirmado.</p>';
+        mostrarConfirmacion(x, [], null);
+        $("conf-pago").innerHTML = '<p class="mensaje mensaje--info"><span class="giro"></span> Estamos confirmando tu pago con la tarjeta. Esto tarda unos segundos…</p>';
+        var n = 0, t = setInterval(function () {
+          TY.api("reservas.php", { accion: "consultar", codigo: codigo }, "GET").then(function (q) {
+            if (q.ok && q.reserva.pagado) { clearInterval(t); mostrarConfirmacion(q.reserva, [], null); }
+            else if (++n > 20) { clearInterval(t); $("conf-pago").innerHTML = '<p class="mensaje mensaje--info">Tu pago está en verificación. Te enviaremos la confirmación por correo.</p>'; }
+          });
+        }, 3000);
+        return;
       }
+      mostrarConfirmacion(x, r.metodos || [], null);
     });
     return true;
   }
@@ -367,6 +380,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     Promise.all([TY.cargarReservas(), TY.apiDisponible()]).then(function (res) {
       R = res[0]; hayApi = res[1];
+      if (!hayApi) $("btn-pagar").lastChild.textContent = " Reservar";
       if (revisarRetorno()) { /* se muestra la reserva al volver del pago */ }
       pintarServicios();
       pintarSintomas();

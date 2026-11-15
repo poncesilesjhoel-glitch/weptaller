@@ -14,20 +14,20 @@ window.TALLER_CONFIG = {
   /* ---------- 1. Identidad del negocio ---------- */
   negocio: {
     nombre: "TORKE",            // Nombre comercial
-    titular: "",                   // Nombre completo del titular o razón social
-    nit: "",                       // NIT / RUC / identificación comercial
-    pais: "",                      // Ej.: "Colombia"
-    ciudad: "",                    // Ej.: "Medellín"
-    direccion: "",                 // Dirección física del taller
-    correo: "",                    // Correo de contacto (también recibe las reservas)
-    whatsapp: "",                  // Solo números con código de país. Ej.: "573001234567"
+    titular: "Jhoel Ponce",                   // Nombre completo del titular o razón social
+    nit: "13745460",                       // NIT / RUC / identificación comercial
+    pais: "Bolivia",               // País
+    ciudad: "Cochabamba",                    // Ej.: "Medellín"
+    direccion: "Colcapirhua, OTB Martín Cárdenas",                 // Dirección física del taller
+    correo: "j2930741@gmail.com",                    // Correo de contacto (también recibe las reservas)
+    whatsapp: "59174657211",                  // Solo números con código de país. Ej.: "59170000000"
     horarioTexto: "Lunes a viernes, de 8:00 a 17:00",
     dominio: "https://taller.poncesiles.com"                 // Ej.: "https://www.tutaller.com" (para enlaces en correos)
   },
 
   /* ---------- 2. Moneda y formato ---------- */
-  moneda: "USD",                   // Código ISO: COP, PEN, MXN, CLP, USD, ARS...
-  locale: "es",                    // Formato de números: "es-CO", "es-PE", "es-MX"...
+  moneda: "BOB",                   // Bolivianos (Bs)
+  locale: "es-BO",                 // Formato de números de Bolivia
 
   /* ---------- 3. Pagos con dLocal Go ----------
      Opción A (más simple): crea un "Link de pago" en tu panel de dLocal Go

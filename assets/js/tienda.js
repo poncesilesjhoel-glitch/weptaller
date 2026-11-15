@@ -9,6 +9,8 @@
   var filtro = "todas";
   var busqueda = "";
   var carrito = leer();
+  var hayApi = false;
+  var enCheckout = false;
 
   function leer() {
     try { return JSON.parse(localStorage.getItem(CLAVE)) || {}; } catch (e) { return {}; }
@@ -27,9 +29,11 @@
   /* ---------- Catálogo ---------- */
   function cargar() {
     var cont = document.getElementById("productos");
-    fetch("productos.json", { cache: "no-cache" })
-      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
-      .then(function (d) {
+    TY.cargarDatos()
+      .then(function (datos) {
+        hayApi = datos.api;
+        var d = datos.catalogo;
+        if (!d) throw new Error("sin catálogo");
         productos = (d.productos || []).filter(function (p) { return p && p.id && p.nombre; });
         categorias = d.categorias || {};
         // Limpia del carrito productos que ya no existen
@@ -124,6 +128,7 @@
     }
     document.getElementById("carrito-total").textContent = TY.moneda(total());
     document.getElementById("carrito-finalizar").disabled = !ids.length;
+    if (!ids.length && enCheckout) modoCheckout(false);
     document.getElementById("carrito-vaciar").disabled = !ids.length;
   }
 
@@ -164,14 +169,61 @@
     document.querySelector("#carrito .cerrar").focus();
   }
   function cerrar() {
+    if (enCheckout) modoCheckout(false);
     document.getElementById("carrito").hidden = true;
     document.body.style.overflow = "";
     if (ultimoFoco) ultimoFoco.focus();
   }
 
+  /* ---------- Checkout: crea el pedido y lleva a la página de pago ---------- */
+  function modoCheckout(si) {
+    enCheckout = si;
+    document.getElementById("carrito-lista").hidden = si;
+    document.getElementById("checkout").hidden = !si;
+    document.getElementById("carrito-vaciar").hidden = si;
+    document.getElementById("carrito-finalizar").textContent = si ? "Confirmar pedido y pagar" : "Finalizar pedido";
+    document.getElementById("checkout-msg").innerHTML = "";
+    if (si) document.getElementById("ck-nombre").focus();
+  }
+
+  function confirmarPedido() {
+    var f = document.getElementById("checkout");
+    var salida = document.getElementById("checkout-msg");
+    var envio = f.entrega.value === "envio";
+    var reglas = {
+      nombre: function (v) { return v.length >= 3; },
+      telefono: function (v) { return v.replace(/\D/g, "").length >= 7; },
+      correo: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); },
+      direccion: function (v) { return !envio || v.length >= 6; }
+    };
+    var malo = null;
+    Object.keys(reglas).forEach(function (k) {
+      var ok = reglas[k](f[k].value.trim());
+      f[k].setAttribute("aria-invalid", ok ? "false" : "true");
+      if (!ok && !malo) malo = f[k];
+    });
+    if (malo) { salida.innerHTML = '<p class="mensaje mensaje--error">Revisa los campos marcados en rojo.</p>'; malo.focus(); return; }
+    var boton = document.getElementById("carrito-finalizar");
+    boton.disabled = true; boton.textContent = "Creando pedido…";
+    TY.api("pedidos.php", {
+      accion: "crear",
+      items: Object.keys(carrito).map(function (id) { return { id: id, cantidad: carrito[id] }; }),
+      cliente: { nombre: f.nombre.value.trim(), telefono: f.telefono.value.trim(), correo: f.correo.value.trim() },
+      entrega: f.entrega.value, direccion: f.direccion.value.trim(), nota: f.nota.value.trim()
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.error || "No se pudo crear el pedido.");
+      carrito = {}; guardar();
+      location.href = "pedido.html?codigo=" + encodeURIComponent(r.pedido.codigo);
+    }).catch(function (err) {
+      boton.disabled = false; boton.textContent = "Confirmar pedido y pagar";
+      salida.innerHTML = '<p class="mensaje mensaje--error">' + TY.escapar(err.message || "Error de conexión.") + "</p>";
+    });
+  }
+
   function finalizar() {
     var ids = Object.keys(carrito);
     if (!ids.length) return;
+    if (hayApi) { if (enCheckout) confirmarPedido(); else modoCheckout(true); return; }
     var lineas = ids.map(function (id) {
       var p = porId(id); return "• " + carrito[id] + " x " + p.nombre + " — " + TY.moneda(p.precio * carrito[id]);
     });
@@ -217,6 +269,12 @@
       if (e.key === "Escape" && !document.getElementById("carrito").hidden) cerrar();
     });
     document.getElementById("carrito-finalizar").addEventListener("click", finalizar);
+    document.getElementById("checkout-volver").addEventListener("click", function () { modoCheckout(false); });
+    document.getElementById("checkout").addEventListener("submit", function (e) { e.preventDefault(); confirmarPedido(); });
+    document.getElementById("checkout").addEventListener("change", function (e) {
+      if (e.target.name === "entrega") document.getElementById("ck-direccion-campo").hidden = e.target.value !== "envio";
+    });
+    document.getElementById("checkout").addEventListener("input", function (e) { e.target.removeAttribute("aria-invalid"); });
     document.getElementById("carrito-vaciar").addEventListener("click", function () {
       carrito = {}; guardar(); pintarCarrito();
     });

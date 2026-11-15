@@ -4,7 +4,7 @@ declare(strict_types=1);
 require __DIR__ . '/_lib.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') responder(['ok' => false, 'error' => 'Método no permitido.'], 405);
-if (!$CONFIG['correo_taller']) responder(['ok' => false, 'error' => 'El correo del taller no está configurado.'], 500);
+if (!correoTaller()) responder(['ok' => false, 'error' => 'El correo del taller no está configurado.'], 500);
 
 $in = entrada();
 $d = [
@@ -17,7 +17,7 @@ if (mb_strlen($d['nombre']) < 2 || !filter_var($d['correo'], FILTER_VALIDATE_EMA
 }
 
 $h = fn($v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
-$ok = enviarCorreo($CONFIG['correo_taller'], 'Contacto web: ' . $d['asunto'],
+$ok = enviarCorreo(correoTaller(), 'Contacto web: ' . $d['asunto'],
     '<p><b>Nombre:</b> ' . $h($d['nombre']) . '<br><b>Teléfono:</b> ' . $h($d['telefono']) . '<br><b>Correo:</b> ' . $h($d['correo'])
     . '<br><b>Asunto:</b> ' . $h($d['asunto']) . '</p><p>' . nl2br($h($d['mensaje'])) . '</p>', $d['correo']);
 

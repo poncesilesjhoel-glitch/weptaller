@@ -14,6 +14,7 @@
   <script>document.documentElement.classList.add("js");</script>
   <script src="assets/js/config.js"></script>
   <script src="assets/js/common.js" defer></script>
+  <script src="assets/js/pagos.js" defer></script>
   <script src="assets/js/reservar.js" defer></script>
   <script src="assets/js/anim.js" defer></script>
 </head>
@@ -158,7 +159,7 @@
               </div>
 
               <label class="check" style="margin-bottom:10px"><input type="checkbox" id="acepto-politica"> <span>Leí y acepto la política de cancelación, los <a href="terminos.html" target="_blank" rel="noopener">Términos y Condiciones</a> y la <a href="privacidad.html" target="_blank" rel="noopener">Política de Privacidad</a>.</span></label>
-              <p class="ayuda" style="font-size:.85rem;color:var(--texto-suave)">El pago se procesa de forma segura en dLocal Go. Nunca almacenamos los datos de tu tarjeta.</p>
+              <p class="ayuda" style="font-size:.85rem;color:var(--texto-suave)">En el siguiente paso eliges cómo pagar: <strong>QR</strong> (desde la app de cualquier banco de Bolivia) o <strong>tarjeta</strong> de débito o crédito con dLocal Go. Nunca almacenamos los datos de tu tarjeta.</p>
             </fieldset>
 
             <div id="reserva-msg" role="alert" aria-live="assertive"></div>
@@ -168,7 +169,7 @@
               <button type="button" class="btn btn--primario" id="btn-siguiente">Continuar →</button>
               <button type="button" class="btn btn--primario" id="btn-pagar" hidden>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                Pagar adelanto
+                Reservar y pagar adelanto
               </button>
             </div>
           </form>
@@ -243,7 +244,7 @@
     </div>
     <div class="footer__base">
       <span>© <span data-anio>2026</span> <span data-cfg="negocio.nombre">TORKE</span>. Todos los derechos reservados.</span>
-      <span>Pagos procesados de forma segura con dLocal Go.</span>
+      <span>Pagos seguros con QR y tarjeta (dLocal Go).</span>
     </div>
   </div>
 </footer>

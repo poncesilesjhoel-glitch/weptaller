@@ -1,14 +1,8 @@
 {
   "_instrucciones": [
-    "CATÁLOGO DE LA TIENDA. Los JSON no admiten comentarios, por eso las instrucciones van en esta lista (el sitio la ignora).",
-    "PARA AÑADIR UN PRODUCTO: copia un bloque { ... } de la lista 'productos', pégalo al final, separa con una coma y cambia sus datos.",
-    "id: texto único, sin espacios ni tildes (ej.: 'aceite-10w40').",
-    "categoria: una de estas -> repuestos, aceites, filtros, frenos, baterias, llantas, accesorios.",
-    "precio: solo números, con punto decimal (ej.: 38.50). La moneda se define en assets/js/config.js.",
-    "foto: ruta de la imagen. Sube tus fotos a assets/img/productos/ (JPG, PNG o WEBP de unos 600x600 px, menos de 150 KB) y escribe aquí su ruta, ej.: 'assets/img/productos/mi-foto.jpg'.",
-    "etiqueta (opcional): texto corto que aparece sobre la foto, ej.: 'Más vendido'. Si no la quieres, borra la línea.",
-    "disponible: true si hay stock, false para mostrarlo como agotado.",
-    "Después de editar, valida el archivo en https://jsonlint.com para evitar errores de comas o comillas."
+    "Catálogo inicial de la tienda. Con el backend activo, el catálogo se administra desde el panel (admin.html › Catálogo): ahí agregas, editas y quitas productos, cambias precios y subes fotos.",
+    "Este archivo solo se usa si el sitio funciona sin backend o mientras no hayas guardado el catálogo en el panel por primera vez.",
+    "precio: en bolivianos (Bs), solo números con punto decimal."
   ],
   "categorias": {
     "repuestos": "Repuestos",
@@ -24,7 +18,7 @@
       "id": "aceite-sintetico-5w30",
       "nombre": "Aceite sintético 5W-30 (4 L)",
       "categoria": "aceites",
-      "precio": 38.0,
+      "precio": 280,
       "descripcion": "Aceite 100 % sintético para motores a gasolina modernos. Protección en arranque en frío y alta temperatura.",
       "foto": "assets/img/productos/aceite.webp",
       "etiqueta": "Más vendido",
@@ -34,7 +28,7 @@
       "id": "filtro-aceite",
       "nombre": "Filtro de aceite estándar",
       "categoria": "filtros",
-      "precio": 9.5,
+      "precio": 60,
       "descripcion": "Filtro de rosca con válvula antirretorno. Indícanos marca y modelo para confirmar compatibilidad.",
       "foto": "assets/img/productos/filtro-aceite.webp",
       "disponible": true
@@ -43,7 +37,7 @@
       "id": "filtro-aire-conico",
       "nombre": "Filtro de aire cónico de alto flujo",
       "categoria": "filtros",
-      "precio": 29.0,
+      "precio": 180,
       "descripcion": "Filtro lavable y reutilizable que mejora el flujo de aire al motor. Incluye abrazadera de montaje.",
       "foto": "assets/img/productos/filtro-aire.webp",
       "disponible": true
@@ -52,7 +46,7 @@
       "id": "kit-frenos-delanteros",
       "nombre": "Kit de frenos delanteros (discos y pastillas)",
       "categoria": "frenos",
-      "precio": 89.0,
+      "precio": 650,
       "descripcion": "Par de discos ventilados y juego de pastillas cerámicas. Frenado firme y silencioso.",
       "foto": "assets/img/productos/frenos.webp",
       "disponible": true
@@ -61,7 +55,7 @@
       "id": "bateria-12v-60ah",
       "nombre": "Batería 12 V 60 Ah",
       "categoria": "baterias",
-      "precio": 95.0,
+      "precio": 750,
       "descripcion": "Batería libre de mantenimiento con 12 meses de garantía. Instalación incluida en el taller.",
       "foto": "assets/img/productos/bateria.webp",
       "etiqueta": "Instalación incluida",
@@ -71,7 +65,7 @@
       "id": "llanta-195-65-r15",
       "nombre": "Llanta 195/65 R15",
       "categoria": "llantas",
-      "precio": 72.0,
+      "precio": 520,
       "descripcion": "Llanta para auto de uso urbano y carretera, con buen agarre en piso mojado.",
       "foto": "assets/img/productos/llanta.webp",
       "etiqueta": "Garantía de fábrica",
@@ -81,7 +75,7 @@
       "id": "bujias-iridio",
       "nombre": "Juego de bujías de iridio (x4)",
       "categoria": "repuestos",
-      "precio": 24.0,
+      "precio": 170,
       "descripcion": "Encendido estable y mayor vida útil que las bujías de cobre convencionales.",
       "foto": "assets/img/productos/bujias.webp",
       "disponible": true
@@ -90,7 +84,7 @@
       "id": "plumillas-limpiaparabrisas",
       "nombre": "Plumillas limpiaparabrisas (par)",
       "categoria": "accesorios",
-      "precio": 18.0,
+      "precio": 120,
       "descripcion": "Plumillas de silicona tipo flexible, barrido limpio y sin ruido. Varias medidas.",
       "foto": "assets/img/productos/plumillas.webp",
       "disponible": true

@@ -5,6 +5,7 @@ api/config.php
 # Reservas y mensajes reales de clientes
 api/datos/*.json
 api/datos/*.log
+api/datos/img/
 
 # Sistema / editores
 .DS_Store
