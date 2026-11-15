@@ -1108,3 +1108,5 @@ fieldset.campo legend { font-weight: 600; font-size: .9rem; margin-bottom: 8px; 
 .qr-fijo__img .vacio { width: 160px; height: 160px; display: grid; place-items: center; border: 2px dashed var(--borde); border-radius: 12px; padding: 0; }
 .stats .stat b { font-size: 1.5rem; }
 @media (max-width: 560px) { .admin-caja { padding: 16px; } .admin-guardar { padding: 12px; } }
+.campo input[type="checkbox"], .campo input[type="radio"] { width: auto; min-height: 0; padding: 0; margin-top: 3px; flex: none; accent-color: var(--naranja); }
+.ck-entrega .check { align-items: flex-start; }
