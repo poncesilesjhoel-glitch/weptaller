@@ -8,7 +8,7 @@
 (function () {
   "use strict";
 
-  var CLAVE_LOCAL = "torke_reservas";
+  var CLAVE_LOCAL = "automax_reservas";
   var SINTOMAS = [
     "Ruidos al frenar", "Vibración al manejar", "Luz de check engine encendida", "Humo",
     "Pérdida de aceite o líquido", "No enciende", "Sobrecalentamiento",
@@ -72,7 +72,7 @@
     var c = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = "";
     var a = new Uint32Array(6); (window.crypto || window.msCrypto).getRandomValues(a);
     for (var i = 0; i < 6; i++) s += c[a[i] % c.length];
-    return "TK-" + s;
+    return "AM-" + s;
   }
 
   /* ---------- Pintado de pasos ---------- */
@@ -267,7 +267,7 @@
         return;
       }
       var reserva = r.reserva;
-      try { sessionStorage.setItem("torke_ultima", JSON.stringify(reserva)); } catch (e) { /* nada */ }
+      try { sessionStorage.setItem("automax_ultima", JSON.stringify(reserva)); } catch (e) { /* nada */ }
       try { history.replaceState(null, "", "reservar.html?codigo=" + encodeURIComponent(reserva.codigo)); } catch (e) { /* nada */ }
       mostrarConfirmacion(reserva, r.metodos || [], r);
     }).catch(function () {
@@ -347,13 +347,13 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  /* Ver una reserva o volver del pago: reservar.html?codigo=TK-XXXXXX[&pago=ok] */
+  /* Ver una reserva o volver del pago: reservar.html?codigo=AM-XXXXXX[&pago=ok] */
   function revisarRetorno() {
     var p = new URLSearchParams(location.search);
     var codigo = p.get("codigo");
     if (!codigo) return false;
     var guardada = null;
-    try { guardada = JSON.parse(sessionStorage.getItem("torke_ultima")); } catch (e) { /* nada */ }
+    try { guardada = JSON.parse(sessionStorage.getItem("automax_ultima")); } catch (e) { /* nada */ }
     var obtener = hayApi
       ? TY.api("reservas.php", { accion: "consultar", codigo: codigo }, "GET").then(function (r) { return r.ok ? r : null; })
       : Promise.resolve(guardada && guardada.codigo === codigo ? { reserva: guardada, metodos: [] } : null);

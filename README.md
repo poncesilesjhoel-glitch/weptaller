@@ -1,4 +1,4 @@
-# TORKE: sitio web con reservas, tienda y panel de administración
+# AUTOMAX: sitio web con reservas, tienda y panel de administración
 
 Sitio en HTML, CSS y JavaScript puros (sin frameworks) con backend PHP y precios en **bolivianos (Bs)**:
 
@@ -9,13 +9,13 @@ Sitio en HTML, CSS y JavaScript puros (sin frameworks) con backend PHP y precios
 - **Panel `admin.html`** con usuario y contraseña propios: reservas, pedidos, catálogo con fotos, servicios y precios, horarios, medios de pago y datos del negocio.
 - Páginas legales completas: términos, envíos, reembolsos y privacidad.
 
-Publicado en Render: <https://taller.poncesiles.com>
+Publicado en Render: <https://automax.poncesiles.com>
 
 ---
 
 ## 1. Panel de administración
 
-Entra a `https://taller.poncesiles.com/admin.html`.
+Entra a `https://automax.poncesiles.com/admin.html`.
 
 **Primer ingreso:** usuario `admin` y la clave inicial (variable `ADMIN_CLAVE` en Render, o `admin_clave` en `api/config.php`). El panel te pide crear tu propio usuario y contraseña; desde ese momento la clave inicial deja de funcionar. Puedes cambiarlos cuando quieras en **Mi cuenta**.
 
@@ -36,7 +36,7 @@ Todo lo que guardas en el panel se ve en el sitio al instante, sin tocar código
 
 1. Pide a tu ejecutivo del BNB el acceso a la **API QR Simple (Open Banking)**. Te entregan un `accountId` y un `authorizationId`, primero de pruebas y luego de producción.
 2. En **Panel › Pagos › QR Simple — BNB** pégalos, elige el entorno (pruebas o producción), marca **Activar** y pulsa **Probar conexión**.
-3. Si el BNB te pide una URL de notificación, registra la que muestra el panel: `https://taller.poncesiles.com/api/webhook-bnb.php`. Es opcional: mientras el cliente tiene el QR abierto, el sitio consulta el estado cada 5 segundos.
+3. Si el BNB te pide una URL de notificación, registra la que muestra el panel: `https://automax.poncesiles.com/api/webhook-bnb.php`. Es opcional: mientras el cliente tiene el QR abierto, el sitio consulta el estado cada 5 segundos.
 
 Para cada reserva o pedido, el sitio genera un QR de un solo uso por el monto exacto. Cuando el cliente paga desde la app de su banco, la reserva se confirma sola y llegan los correos.
 
@@ -85,7 +85,7 @@ Las llaves secretas se guardan en la base de datos y el panel solo muestra los �
 
 ## 4. Dónde se guardan los datos
 
-- **En Render:** en PostgreSQL, a través de la variable `DATABASE_URL`. Las tablas son `torke_reservas`, `torke_pedidos`, `torke_ajustes` (panel, catálogo, pagos y cuenta) y `torke_imagenes` (fotos subidas).
+- **En Render:** en PostgreSQL, a través de la variable `DATABASE_URL`. Las tablas son `automax_reservas`, `automax_pedidos`, `automax_ajustes` (panel, catálogo, pagos y cuenta) y `automax_imagenes` (fotos subidas).
 - **En un hosting PHP sin base de datos:** en archivos dentro de `api/datos/`, protegidos por `.htaccess`.
 
 > ⚠️ La base `ponceshop-db` del plan gratis de Render vence el **20 de noviembre de 2026**. Antes de esa fecha, pásala a un plan de pago o cambia `DATABASE_URL` por otra base PostgreSQL (por ejemplo Neon, gratis).
@@ -96,7 +96,7 @@ Las llaves secretas se guardan en la base de datos y el panel solo muestra los �
 |---|---|
 | `DATABASE_URL` | Conexión a PostgreSQL. |
 | `ADMIN_CLAVE` | Clave inicial del panel (solo para el primer ingreso). |
-| `SITIO_URL` | `https://taller.poncesiles.com`, usada en correos y para volver de los pagos. |
+| `SITIO_URL` | `https://automax.poncesiles.com`, usada en correos y para volver de los pagos. |
 | `CORREO_REMITENTE`, `CORREO_TALLER` | Correos (opcional; el correo del taller también se edita en el panel). |
 | `DLOCAL_API_KEY`, `DLOCAL_SECRET_KEY`, `DLOCAL_SANDBOX` | Opcional; lo recomendado es cargarlas desde el panel. |
 

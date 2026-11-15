@@ -3,7 +3,7 @@
    API de reservas
    GET  ?accion=ping                      -> comprueba que el backend funciona
    GET  ?accion=ocupados&fecha=AAAA-MM-DD -> horas ya reservadas
-   GET  ?accion=consultar&codigo=TK-XXX   -> estado público de una reserva
+   GET  ?accion=consultar&codigo=AM-XXX   -> estado público de una reserva
    POST {accion:"crear", ...}             -> crea una reserva y envía correos
    POST {accion:"estado", codigo, estado} -> (panel) confirmar/cancelar
    POST {accion:"pagado", codigo, pagado} -> (panel) marcar adelanto pagado
@@ -101,7 +101,7 @@ switch ($accion) {
             foreach ($l as $x) {
                 if ($x['fecha'] === $reserva['fecha'] && $x['hora'] === $reserva['hora'] && $x['estado'] !== 'cancelada') return false;
             }
-            $reserva['codigo'] = codigoNuevo('TK-', array_column($l, 'codigo'));
+            $reserva['codigo'] = codigoNuevo('AM-', array_column($l, 'codigo'));
             $l[] = $reserva;
             return true;
         }, true);

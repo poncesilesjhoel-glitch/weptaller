@@ -1,5 +1,5 @@
 /* ==========================================================
-   TORKE — Hoja de estilos principal
+   AUTOMAX — Hoja de estilos principal
    Paleta: morado oscuro, azul oscuro y acento naranja
    ========================================================== */
 :root {
@@ -737,7 +737,7 @@ main { overflow-x: clip; }
 .credito { margin: 0; }
 
 /* ==========================================================
-   v3 — TORKE: tema oscuro vibrante, luces y efectos
+   v3 — AUTOMAX: tema oscuro vibrante, luces y efectos
    Se activa con <body class="oscuro"> (inicio y reservas).
    ========================================================== */
 :root {

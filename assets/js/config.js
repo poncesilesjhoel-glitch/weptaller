@@ -13,7 +13,7 @@ window.TALLER_CONFIG = {
 
   /* ---------- 1. Identidad del negocio ---------- */
   negocio: {
-    nombre: "TORKE",            // Nombre comercial
+    nombre: "AUTOMAX",            // Nombre comercial
     titular: "Jhoel Ponce",                   // Nombre completo del titular o razón social
     nit: "13745460",                       // NIT / RUC / identificación comercial
     pais: "Bolivia",               // País
@@ -22,7 +22,7 @@ window.TALLER_CONFIG = {
     correo: "j2930741@gmail.com",                    // Correo de contacto (también recibe las reservas)
     whatsapp: "59174657211",                  // Solo números con código de país. Ej.: "59170000000"
     horarioTexto: "Lunes a viernes, de 8:00 a 17:00",
-    dominio: "https://taller.poncesiles.com"                 // Ej.: "https://www.tutaller.com" (para enlaces en correos)
+    dominio: "https://automax.poncesiles.com"                 // Ej.: "https://www.tutaller.com" (para enlaces en correos)
   },
 
   /* ---------- 2. Moneda y formato ---------- */

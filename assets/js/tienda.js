@@ -3,7 +3,7 @@
    ===================================================================== */
 (function () {
   "use strict";
-  var CLAVE = "torke_carrito";
+  var CLAVE = "automax_carrito";
   var productos = [];
   var categorias = {};
   var filtro = "todas";

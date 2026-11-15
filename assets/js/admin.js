@@ -7,7 +7,7 @@
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
   var e = function (t) { return TY.escapar(t); };
-  var CLAVE_SESION = "torke_admin_token";
+  var CLAVE_SESION = "automax_admin_token";
   var D = null; // datos del panel
   var DIAS = [[1, "Lunes"], [2, "Martes"], [3, "Miércoles"], [4, "Jueves"], [5, "Viernes"], [6, "Sábado"], [0, "Domingo"]];
   var EST_PEDIDO = { pendiente: "Pendiente de pago", pagado: "Pagado", preparando: "En preparación", enviado: "Enviado", entregado: "Entregado", cancelado: "Cancelado" };
@@ -105,7 +105,7 @@
   function tab(nombre) {
     document.querySelectorAll(".admin-tabs [data-tab]").forEach(function (b) { b.setAttribute("aria-selected", b.getAttribute("data-tab") === nombre ? "true" : "false"); });
     document.querySelectorAll(".admin-sec").forEach(function (s) { s.hidden = s.getAttribute("data-sec") !== nombre; });
-    try { sessionStorage.setItem("torke_admin_tab", nombre); } catch (x) { /* nada */ }
+    try { sessionStorage.setItem("automax_admin_tab", nombre); } catch (x) { /* nada */ }
   }
 
   /* =================== Reservas =================== */
@@ -262,7 +262,7 @@
 
   function tarjetaProducto(p, i) {
     return '<article class="ed-producto" data-i="' + i + '">' +
-      '<div class="ed-producto__foto"><img src="' + e(p.foto || "assets/img/logo-torke-icono.svg") + '" alt="" width="120" height="120">' +
+      '<div class="ed-producto__foto"><img src="' + e(p.foto || "assets/img/logo-automax-icono.svg") + '" alt="" width="120" height="120">' +
         '<label class="btn btn--borde btn--sm">Cambiar foto<input type="file" accept="image/*" data-foto hidden></label></div>' +
       '<div class="ed-producto__campos">' +
         '<div class="campo campo--ancho"><label>Nombre</label><input data-f="nombre" value="' + e(p.nombre) + '" maxlength="120"></div>' +
@@ -496,7 +496,7 @@
 
   /* =================== Negocio =================== */
   var CAMPOS_NEGOCIO = [
-    ["nombre", "Nombre comercial", "TORKE"], ["titular", "Titular o razón social", "Nombre completo o empresa"], ["nit", "NIT", ""],
+    ["nombre", "Nombre comercial", "AUTOMAX"], ["titular", "Titular o razón social", "Nombre completo o empresa"], ["nit", "NIT", ""],
     ["pais", "País", "Bolivia"], ["ciudad", "Ciudad", "Ej.: Santa Cruz de la Sierra"], ["direccion", "Dirección del taller", "Calle, número, zona"],
     ["correo", "Correo (recibe reservas y pedidos)", "taller@poncesiles.com"], ["whatsapp", "WhatsApp (con código de país)", "59170000000"],
     ["horarioTexto", "Horario (texto)", "Lunes a viernes, de 8:00 a 17:00"]
@@ -609,7 +609,7 @@
     $("guardar-negocio").addEventListener("click", guardarNegocio);
 
     var t = null; try { t = sessionStorage.getItem(CLAVE_SESION); } catch (x) { /* nada */ }
-    try { var tb = sessionStorage.getItem("torke_admin_tab"); if (tb) tab(tb); } catch (x) { /* nada */ }
+    try { var tb = sessionStorage.getItem("automax_admin_tab"); if (tb) tab(tb); } catch (x) { /* nada */ }
 
     TY.apiDisponible().then(function (ok) {
       if (!ok) {

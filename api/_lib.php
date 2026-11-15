@@ -250,7 +250,7 @@ function negocioGuardado(): array {
 
 function negocio(): array {
     global $CONFIG;
-    $base = ['nombre' => $CONFIG['negocio_nombre'] ?: 'TORKE', 'titular' => '', 'nit' => '', 'pais' => '', 'ciudad' => '',
+    $base = ['nombre' => $CONFIG['negocio_nombre'] ?: 'AUTOMAX', 'titular' => '', 'nit' => '', 'pais' => '', 'ciudad' => '',
         'direccion' => '', 'correo' => '', 'whatsapp' => '', 'horarioTexto' => ''];
     return array_merge($base, negocioGuardado());
 }

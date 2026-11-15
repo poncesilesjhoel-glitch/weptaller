@@ -14,7 +14,7 @@
   function iniciarPagina() { body.classList.add("cargado"); }
   var intro = document.getElementById("intro");
   var yaVisto = false;
-  try { yaVisto = sessionStorage.getItem("torke_intro") === "1"; } catch (e) { /* nada */ }
+  try { yaVisto = sessionStorage.getItem("automax_intro") === "1"; } catch (e) { /* nada */ }
   if (intro && !yaVisto && !reducir) {
     var inicio = Date.now();
     var cerrar = function () {
@@ -25,7 +25,7 @@
         iniciarPagina();
         setTimeout(function () { intro.remove(); }, 700);
       }, espera);
-      try { sessionStorage.setItem("torke_intro", "1"); } catch (e) { /* nada */ }
+      try { sessionStorage.setItem("automax_intro", "1"); } catch (e) { /* nada */ }
     };
     if (document.readyState === "complete") cerrar(); else window.addEventListener("load", cerrar);
     setTimeout(cerrar, 2800); // nunca más de ~3 s

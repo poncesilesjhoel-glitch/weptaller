@@ -170,7 +170,7 @@ switch ($accion) {
                 if (!isset($cats[$cat])) { $cat = $cat ?: 'otros'; $cats[$cat] = $cats[$cat] ?? ucfirst(str_replace('-', ' ', $cat)); }
                 $prods[] = [
                     'id' => $id, 'nombre' => $nombre, 'categoria' => $cat, 'precio' => numero($p['precio'] ?? 0, 0, 10000000),
-                    'descripcion' => texto($p['descripcion'] ?? '', 400), 'foto' => fotoValida(texto($p['foto'] ?? '', 200)) ?: 'assets/img/logo-torke-icono.svg',
+                    'descripcion' => texto($p['descripcion'] ?? '', 400), 'foto' => fotoValida(texto($p['foto'] ?? '', 200)) ?: 'assets/img/logo-automax-icono.svg',
                     'etiqueta' => texto($p['etiqueta'] ?? '', 40), 'disponible' => !empty($p['disponible']),
                 ];
             }
