@@ -13,3 +13,7 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+
+# Informes locales (contienen datos privados)
+*.docx
+*.pdf

@@ -12,7 +12,7 @@
   var SINTOMAS = [
     "Ruidos al frenar", "Vibración al manejar", "Luz de check engine encendida", "Humo",
     "Pérdida de aceite o líquido", "No enciende", "Sobrecalentamiento",
-    "Aire acondicionado no enfría", "Dirección dura", "Otro"
+    "Aire acondicionado no enfría", "Dirección dura", "Falla eléctrica (luces, tablero, arranque)", "Otro"
   ];
   var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   var DIAS = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"];

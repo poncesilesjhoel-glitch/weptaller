@@ -52,6 +52,7 @@
       <nav id="nav" class="nav" aria-label="Menú principal">
         <a href="#beneficios">Beneficios</a>
         <a href="#servicios">Servicios</a>
+        <a href="#electricidad">Electricidad</a>
         <a href="#tienda">Tienda</a>
         <a href="#preguntas">Preguntas</a>
         <a href="#contacto">Contacto</a>
@@ -440,6 +441,39 @@
     </div>
   </section>
 
+  <!-- 4b. ELECTRÓNICA Y ELECTRICIDAD -->
+  <section id="electricidad" class="seccion elec" aria-labelledby="elec-titulo">
+    <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="contenedor">
+      <div class="elec__grid">
+        <div class="elec__foto" data-anim="izq">
+          <img src="assets/img/fotos/electrico.webp" alt="Caja de fusibles y cableado eléctrico en el compartimento del motor de un auto" loading="lazy" width="800" height="560">
+          <span class="elec__chispa" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></span>
+          <span class="servicio-card__precio" data-servicio="electrico"><small>Diagnóstico desde</small><strong data-precio>—</strong></span>
+        </div>
+        <div class="elec__texto">
+          <div class="seccion__cabecera seccion__cabecera--izq" data-anim="der">
+            <span class="etiqueta">Electrónica y electricidad</span>
+            <h2 id="elec-titulo" class="titulo-anim">Electricidad automotriz <span class="grad">sin adivinanzas</span></h2>
+            <p>Detectamos fallas eléctricas y electrónicas con equipo de medición y escáner: medimos, te mostramos el problema y te damos un presupuesto antes de reparar.</p>
+          </div>
+          <ul class="elec__lista">
+          <li class="elec__item foco" data-anim="arriba" style="--d:0"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></i><div><b>Alternador y arranque</b><span>Carga de batería, motor de arranque y regulador de voltaje.</span></div></li>
+          <li class="elec__item foco" data-anim="arriba" style="--d:1"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg></i><div><b>Luces e iluminación</b><span>Faros, stops, direccionales, LED y tablero.</span></div></li>
+          <li class="elec__item foco" data-anim="arriba" style="--d:2"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9zM9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg></i><div><b>Computadora y sensores</b><span>Diagnóstico de ECU, sensores, inyección electrónica y check engine.</span></div></li>
+          <li class="elec__item foco" data-anim="arriba" style="--d:0"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h4v4H4zM16 16h4v4h-4zM8 6h4a2 2 0 0 1 2 2v8a2 2 0 0 0 2 2"/></svg></i><div><b>Cableado y fusibles</b><span>Cortocircuitos, consumo de batería, relés y cajas de fusibles.</span></div></li>
+          <li class="elec__item foco" data-anim="arriba" style="--d:1"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></i><div><b>Alarmas y cierre centralizado</b><span>Instalación y reparación de alarmas, controles y seguros eléctricos.</span></div></li>
+          <li class="elec__item foco" data-anim="arriba" style="--d:2"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/></svg></i><div><b>Accesorios eléctricos</b><span>Vidrios eléctricos, radio, cámaras de retroceso y aire acondicionado.</span></div></li>
+          </ul>
+          <div class="elec__acciones" data-anim="arriba">
+            <a class="btn btn--primario" href="reservar.html?servicio=electrico" data-magnetico>Reservar diagnóstico eléctrico <svg class="flecha" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a class="btn btn--secundario" href="#contacto" data-asunto="Consulta sobre un servicio">Hacer una consulta</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- 5. TIENDA -->
   <section id="tienda" class="seccion" aria-labelledby="tienda-titulo">
     <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -579,6 +613,20 @@
           <button class="btn btn--primario btn--bloque" type="submit" style="margin-top:18px">Enviar mensaje <svg class="flecha" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button>
           <div id="contacto-msg" role="status" aria-live="polite"></div>
         </form>
+      </div>
+
+      <div class="mapa" data-anim="arriba">
+        <div class="mapa__info">
+          <span class="etiqueta">Ubicación</span>
+          <h3>Visítanos en el taller</h3>
+          <p class="mapa__dir"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span><strong data-cfg="negocio.direccion">Villa Candelaria, calle 6 y calle 5, zona norte</strong><br><span data-cfg="negocio.ubicacion">Cochabamba, Bolivia</span></span></p>
+          <p><span data-cfg="negocio.horarioTexto">Lunes a viernes, de 8:00 a 17:00</span></p>
+          <a class="btn btn--primario" href="https://www.google.com/maps/search/?api=1&amp;query=Villa+Candelaria+calle+6+calle+5+zona+norte+Cochabamba+Bolivia" target="_blank" rel="noopener">Cómo llegar <svg class="flecha" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+        <div class="mapa__marco">
+          <iframe title="Mapa de ubicación del taller en Villa Candelaria, zona norte de Cochabamba" src="https://maps.google.com/maps?q=Villa%20Candelaria%2C%20Cochabamba%2C%20Bolivia&amp;z=16&amp;hl=es&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        </div>
       </div>
     </div>
   </section>

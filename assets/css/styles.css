@@ -1110,3 +1110,40 @@ fieldset.campo legend { font-weight: 600; font-size: .9rem; margin-bottom: 8px; 
 @media (max-width: 560px) { .admin-caja { padding: 16px; } .admin-guardar { padding: 12px; } }
 .campo input[type="checkbox"], .campo input[type="radio"] { width: auto; min-height: 0; padding: 0; margin-top: 3px; flex: none; accent-color: var(--naranja); }
 .ck-entrega .check { align-items: flex-start; }
+
+/* =====================================================================
+   v5 — Electrónica y electricidad + mapa de ubicación
+   ===================================================================== */
+.seccion__cabecera--izq { text-align: left; margin: 0 0 24px; max-width: none; }
+.elec__grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 48px; align-items: center; }
+.elec__foto { position: relative; border-radius: 24px; overflow: hidden; box-shadow: 0 30px 70px rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.1); }
+.elec__foto img { display: block; width: 100%; height: auto; aspect-ratio: 10 / 7; object-fit: cover; transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+.elec__foto:hover img { transform: scale(1.06); }
+.elec__foto::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(7,5,26,.7)); pointer-events: none; }
+.elec__foto .servicio-card__precio { z-index: 2; }
+.elec__chispa { position: absolute; z-index: 2; top: 18px; left: 18px; width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center; color: #1a1033; background: linear-gradient(135deg, #ffd34d, #ff9a1a); box-shadow: 0 0 0 0 rgba(255,200,60,.6); animation: chispaPulso 2.4s ease-in-out infinite; }
+.elec__chispa svg { width: 28px; height: 28px; animation: chispaParpadeo 3.2s steps(1) infinite; }
+@keyframes chispaPulso { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,200,60,.55); } 50% { box-shadow: 0 0 0 16px rgba(255,200,60,0); } }
+@keyframes chispaParpadeo { 0%, 88%, 94%, 100% { opacity: 1; } 90%, 96% { opacity: .25; } }
+.elec__lista { list-style: none; padding: 0; margin: 0 0 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.elec__item { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 16px; background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.1); transition: transform .25s, border-color .25s, background .25s; }
+.elec__item:hover { transform: translateY(-3px); border-color: rgba(255,200,60,.5); background: rgba(255,200,60,.06); }
+.elec__item i { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: #ffd34d; background: rgba(255,200,60,.12); }
+.elec__item i svg { width: 22px; height: 22px; }
+.elec__item b { display: block; color: #fff; font-size: .95rem; margin-bottom: 2px; }
+.elec__item span { display: block; color: var(--texto-tenue); font-size: .84rem; line-height: 1.45; }
+.elec__acciones { display: flex; flex-wrap: wrap; gap: 12px; }
+@media (max-width: 920px) { .elec__grid { grid-template-columns: 1fr; gap: 30px; } }
+@media (max-width: 560px) { .elec__lista { grid-template-columns: 1fr; } .elec__acciones .btn { width: 100%; } }
+
+.mapa { display: grid; grid-template-columns: 1fr 1.6fr; gap: 0; margin-top: 44px; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04); box-shadow: 0 30px 70px rgba(0,0,0,.35); }
+.mapa__info { padding: 32px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.mapa__info h3 { color: #fff; font-size: 1.4rem; margin: 4px 0 6px; }
+.mapa__dir { display: flex; gap: 10px; align-items: flex-start; margin: 0; }
+.mapa__dir svg { flex: none; color: var(--naranja); margin-top: 2px; }
+.mapa__dir strong { color: #fff; }
+.mapa__info .btn { margin-top: 8px; }
+.mapa__marco { min-height: 340px; position: relative; }
+.mapa__marco iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: saturate(.9) contrast(1.05); }
+@media (max-width: 860px) { .mapa { grid-template-columns: 1fr; } .mapa__marco { min-height: 300px; } .mapa__info { padding: 24px; } }
+.nav a { padding: 8px 10px; }

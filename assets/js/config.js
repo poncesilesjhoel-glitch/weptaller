@@ -18,7 +18,7 @@ window.TALLER_CONFIG = {
     nit: "13745460",                       // NIT / RUC / identificación comercial
     pais: "Bolivia",               // País
     ciudad: "Cochabamba",                    // Ej.: "Medellín"
-    direccion: "Colcapirhua, OTB Martín Cárdenas",                 // Dirección física del taller
+    direccion: "Villa Candelaria, calle 6 y calle 5, zona norte",                 // Dirección física del taller
     correo: "j2930741@gmail.com",                    // Correo de contacto (también recibe las reservas)
     whatsapp: "59174657211",                  // Solo números con código de país. Ej.: "59170000000"
     horarioTexto: "Lunes a viernes, de 8:00 a 17:00",

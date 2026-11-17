@@ -16,12 +16,13 @@
     horaApertura: "08:00", horaCierre: "17:00", pausas: [{ desde: "12:00", hasta: "13:00" }],
     diasLaborables: [1, 2, 3, 4, 5], diasMaximosAnticipacion: 45, feriados: [],
     servicios: [
-      { id: "revision", nombre: "Revisión general", precio: 280, descripcion: "Inspección de 40 puntos con reporte escrito." },
-      { id: "aceite", nombre: "Cambio de aceite", precio: 150, descripcion: "Cambio de aceite y filtro, revisión de niveles." },
+      { id: "revision", nombre: "Revisión general", precio: 300, descripcion: "Inspección de 40 puntos con reporte escrito." },
+      { id: "aceite", nombre: "Cambio de aceite", precio: 100, descripcion: "Cambio de aceite y filtro, revisión de niveles." },
       { id: "frenos", nombre: "Frenos", precio: 200, descripcion: "Diagnóstico de pastillas, discos y líquido." },
       { id: "suspension", nombre: "Suspensión", precio: 200, descripcion: "Amortiguadores, rótulas, bujes y terminales." },
       { id: "bateria", nombre: "Batería", precio: 100, descripcion: "Prueba de carga, alternador y arranque." },
       { id: "escaner", nombre: "Escáner / diagnóstico", precio: 200, descripcion: "Lectura de códigos de falla con escáner." },
+      { id: "electrico", nombre: "Electrónica y electricidad", precio: 200, descripcion: "Diagnóstico eléctrico y electrónico: alternador, arranque, luces, sensores, computadora y cableado." },
       { id: "otro", nombre: "Otro", precio: 180, descripcion: "Revisión de diagnóstico para cualquier otra falla." }
     ]
   };
