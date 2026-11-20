@@ -175,15 +175,6 @@
       var antes = acc.querySelector(".nav-toggle");
       acc.insertBefore(b, antes);
     }
-    if (!acc.querySelector(".admin-btn")) {
-      var ad = document.createElement("a");
-      ad.className = "admin-btn";
-      ad.href = "admin.html";
-      ad.title = "Panel de administración";
-      ad.setAttribute("aria-label", "Panel de administración");
-      ad.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 4 5v6c0 5.5 3.4 9.7 8 11 4.6-1.3 8-5.5 8-11V5z"/><path d="M9 12l2 2 4-4"/></svg><span class="admin-btn__txt">Admin</span>';
-      acc.insertBefore(ad, b);
-    }
     var d = cliente.token() ? cliente.datos() : null;
     if (d) {
       b.classList.add("cuenta-btn--activa");

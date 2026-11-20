@@ -50,11 +50,28 @@
     var f = ev.target, b = f.querySelector("button[type=submit]");
     if (!f.correo.value.trim() || !f.clave.value) { msg(f, "Escribe tu correo y contraseña."); return; }
     b.disabled = true; msg(f, "");
-    TY.api("clientes.php", { accion: "login", correo: f.correo.value.trim(), clave: f.clave.value }).then(function (r) {
-      b.disabled = false;
-      if (!r.ok) { msg(f, r.error || "No se pudo ingresar."); return; }
-      sesionIniciada(r);
-    }).catch(function () { b.disabled = false; msg(f, "Error de conexión. Inténtalo de nuevo."); });
+    var usuario = f.correo.value.trim(), clave = f.clave.value;
+
+    // Si son los datos del administrador, entra directo al panel
+    function comoAdmin(errorCliente) {
+      return TY.api("admin.php", { accion: "login", usuario: usuario, clave: clave }).then(function (a) {
+        if (a.ok) {
+          try { sessionStorage.setItem("automax_admin_token", a.token); } catch (x) { /* nada */ }
+          location.href = "admin.html";
+          return;
+        }
+        b.disabled = false;
+        msg(f, errorCliente || "Correo o contraseña incorrectos.");
+      });
+    }
+
+    var intento = usuario.indexOf("@") === -1
+      ? comoAdmin("")
+      : TY.api("clientes.php", { accion: "login", correo: usuario, clave: clave }).then(function (r) {
+          if (r.ok) { b.disabled = false; sesionIniciada(r); return; }
+          return comoAdmin(r.error);
+        });
+    intento.catch(function () { b.disabled = false; msg(f, "Error de conexión. Inténtalo de nuevo."); });
   }
 
   function registrar(ev) {
