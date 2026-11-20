@@ -142,19 +142,72 @@
     return cargarDatos().then(function (d) { return d.api; });
   }
 
+  /* ---------- Cuenta del cliente (comprador) ---------- */
+  var CLAVE_CLIENTE = "automax_cliente", CLAVE_CLIENTE_DATOS = "automax_cliente_datos";
+  var cliente = {
+    token: function () { try { return localStorage.getItem(CLAVE_CLIENTE) || ""; } catch (e) { return ""; } },
+    datos: function () { try { return JSON.parse(localStorage.getItem(CLAVE_CLIENTE_DATOS)) || null; } catch (e) { return null; } },
+    guardar: function (token, datos) {
+      try {
+        if (token) localStorage.setItem(CLAVE_CLIENTE, token);
+        if (datos) localStorage.setItem(CLAVE_CLIENTE_DATOS, JSON.stringify(datos));
+      } catch (e) { /* sin almacenamiento */ }
+      pintarBotonCuenta();
+    },
+    salir: function () {
+      try { localStorage.removeItem(CLAVE_CLIENTE); localStorage.removeItem(CLAVE_CLIENTE_DATOS); } catch (e) { /* nada */ }
+      pintarBotonCuenta();
+    }
+  };
+
+  function iniciales(nombre) {
+    return String(nombre || "").trim().split(/\s+/).slice(0, 2).map(function (p) { return p.charAt(0).toUpperCase(); }).join("") || "•";
+  }
+
+  function pintarBotonCuenta() {
+    var acc = document.querySelector(".header__acciones");
+    if (!acc || !CFG.API_URL || /admin\.html$/.test(location.pathname)) return;
+    var b = acc.querySelector(".cuenta-btn");
+    if (!b) {
+      b = document.createElement("a");
+      b.className = "cuenta-btn";
+      b.href = "cuenta.html";
+      var antes = acc.querySelector(".nav-toggle");
+      acc.insertBefore(b, antes);
+    }
+    var d = cliente.token() ? cliente.datos() : null;
+    if (d) {
+      b.classList.add("cuenta-btn--activa");
+      b.setAttribute("aria-label", "Mi cuenta: " + d.nombre);
+      b.title = "Mi cuenta";
+      b.innerHTML = '<span class="cuenta-btn__ini">' + escapar(iniciales(d.nombre)) + "</span>";
+    } else {
+      b.classList.remove("cuenta-btn--activa");
+      b.setAttribute("aria-label", "Ingresar o crear cuenta");
+      b.title = "Ingresar o crear cuenta";
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="cuenta-btn__txt">Ingresar</span>';
+    }
+    if (/cuenta\.html$/.test(location.pathname)) b.setAttribute("aria-current", "page");
+  }
+
   var tokenAdmin = "";
   function api(archivo, datos, metodo) {
     var url = CFG.API_URL + archivo;
     var opciones = { method: metodo || "POST", headers: { "Content-Type": "application/json" }, cache: "no-store" };
     if (tokenAdmin) opciones.headers["X-Token"] = tokenAdmin;
+    var tc = cliente.token();
+    if (tc && !tokenAdmin) opciones.headers["X-Cliente"] = tc;
     if (opciones.method === "GET") {
       if (datos) url += (url.indexOf("?") > -1 ? "&" : "?") + new URLSearchParams(datos).toString();
-      if (!tokenAdmin) delete opciones.headers;
+      if (!tokenAdmin && !tc) delete opciones.headers;
     } else {
       opciones.body = JSON.stringify(datos || {});
     }
     return fetch(url, opciones).then(function (r) {
       return r.json().catch(function () { return { ok: false, error: "Respuesta no válida del servidor." }; });
+    }).then(function (d) {
+      if (d && d.sesionCliente === false) cliente.salir();
+      return d;
     });
   }
 
@@ -224,11 +277,13 @@
     cfg: CFG, negocio: N, moneda: moneda, escapar: escapar, enlaceWhatsApp: enlaceWhatsApp,
     ubicacion: ubicacion, cargarReservas: cargarReservas, cargarDatos: cargarDatos, apiDisponible: apiDisponible, api: api,
     aviso: aviso, rellenarConfig: rellenarConfig, comprimirImagen: comprimirImagen,
-    usarToken: function (t) { tokenAdmin = t || ""; }
+    usarToken: function (t) { tokenAdmin = t || ""; },
+    cliente: cliente
   };
 
   document.addEventListener("DOMContentLoaded", function () {
     rellenarConfig();
+    pintarBotonCuenta();
     iniciarMenu();
     cargarDatos().then(function () { rellenarConfig(); rellenarReservas(); });
   });

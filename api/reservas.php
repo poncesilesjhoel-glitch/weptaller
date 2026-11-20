@@ -96,6 +96,8 @@ switch ($accion) {
             'precio' => $precio, 'porcentaje' => $porcentaje, 'adelanto' => round($precio * $porcentaje / 100, 2),
             'estado' => 'pendiente', 'pagado' => false, 'pagoReportado' => false, 'creada' => date('c'),
         ];
+        $cli = clienteActual();
+        if ($cli) $reserva['clienteId'] = $cli['codigo'];
 
         $resultado = conReservas(function (array &$l) use (&$reserva) {
             foreach ($l as $x) {

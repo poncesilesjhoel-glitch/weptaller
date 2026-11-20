@@ -384,6 +384,11 @@
       if (revisarRetorno()) { /* se muestra la reserva al volver del pago */ }
       pintarServicios();
       pintarSintomas();
+      var dc = TY.cliente && TY.cliente.token() ? TY.cliente.datos() : null;
+      if (dc) {
+        var fr = $("form-reserva");
+        fr.nombre.value = dc.nombre || ""; fr.telefono.value = dc.telefono || ""; fr.correo.value = dc.correo || "";
+      }
       mesVista = primerDiaHabil(); mesVista = new Date(mesVista.getFullYear(), mesVista.getMonth(), 1);
       pintarResumen();
 

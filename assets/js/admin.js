@@ -79,6 +79,7 @@
 
   function pintarTodo() {
     faltantes();
+    cargarClientes();
     pintarReservas();
     pintarPedidos();
     pintarCatalogo();
@@ -232,6 +233,60 @@
       if (res.ok) { aviso("Pedido actualizado" + (res.correoEnviado ? " y cliente notificado" : "")); cargar(); }
       else { el.disabled = false; aviso(res.error || "No se pudo actualizar."); }
     }).catch(function () { el.disabled = false; });
+  }
+
+  /* =================== Clientes =================== */
+  var clientes = [];
+
+  function cargarClientes() {
+    return llamar({ accion: "listar" }, "clientes.php").then(function (r) {
+      if (r.ok) { clientes = r.clientes; pintarClientes(); }
+    }).catch(function () { /* sesión */ });
+  }
+
+  function pintarClientes() {
+    var hace30 = Date.now() - 30 * 86400000;
+    var nuevos = clientes.filter(function (c) { return new Date(c.creada).getTime() > hace30; }).length;
+    var conCompra = clientes.filter(function (c) { return c.pedidos > 0; }).length;
+    $("n-clientes").textContent = "";
+    $("stats-clientes").innerHTML = [["Clientes", clientes.length], ["Nuevos (30 días)", nuevos], ["Con pedidos", conCompra], ["Total comprado", TY.moneda(clientes.reduce(function (s, c) { return s + c.comprado; }, 0))]]
+      .map(function (s) { return '<div class="stat"><b>' + s[1] + "</b><span>" + s[0] + "</span></div>"; }).join("");
+    var q = $("fc-buscar").value.trim().toLowerCase();
+    var lista = clientes.filter(function (c) { return !q || [c.nombre, c.correo, c.telefono, c.codigo].join(" ").toLowerCase().indexOf(q) > -1; });
+    if (!lista.length) { $("lista-clientes").innerHTML = '<p class="vacio">' + (clientes.length ? "Ningún cliente coincide con la búsqueda." : "Todavía no hay clientes registrados.") + "</p>"; return; }
+    $("lista-clientes").innerHTML = lista.map(function (c) {
+      return '<article class="reserva-item">' +
+        "<div>" +
+          "<h3>" + e(c.nombre) + ' <span class="estado estado--' + (c.activo ? "confirmada" : "cancelada") + '">' + (c.activo ? "Activo" : "Desactivado") + "</span></h3>" +
+          "<p>" + e(c.correo) + " · " + e(c.telefono) + (c.direccion ? " · " + e(c.direccion) : "") + "</p>" +
+          "<p>" + e(c.codigo) + " · Registrado el " + e(fechaHora(c.creada)) + " · " + c.pedidos + " pedido(s), " + c.reservas + " reserva(s) · Comprado " + TY.moneda(c.comprado) + "</p>" +
+        "</div>" +
+        '<div class="reserva-item__acciones">' +
+          '<button type="button" class="btn btn--borde btn--sm" data-cl="clave" data-c="' + e(c.codigo) + '">Clave temporal</button>' +
+          '<button type="button" class="btn ' + (c.activo ? "btn--peligro" : "btn--ok") + ' btn--sm" data-cl="activo" data-c="' + e(c.codigo) + '">' + (c.activo ? "Desactivar" : "Activar") + "</button>" +
+          '<a class="btn btn--borde btn--sm" href="' + e(wa(c.telefono)) + '" target="_blank" rel="noopener">WhatsApp</a>' +
+        "</div></article>";
+    }).join("");
+  }
+
+  function accionCliente(b) {
+    var codigo = b.getAttribute("data-c");
+    var c = clientes.filter(function (x) { return x.codigo === codigo; })[0];
+    if (!c) return;
+    if (b.getAttribute("data-cl") === "activo") {
+      if (c.activo && !confirm("¿Desactivar la cuenta de " + c.nombre + "? No podrá ingresar hasta que la actives.")) return;
+      llamar({ accion: "activo", codigo: codigo, activo: !c.activo }, "clientes.php").then(function (r) {
+        if (r.ok) { aviso("Cliente actualizado"); cargarClientes(); } else aviso(r.error || "No se pudo actualizar.");
+      }).catch(function () { /* sesión */ });
+      return;
+    }
+    if (!confirm("¿Crear una contraseña temporal para " + c.nombre + "? Su contraseña actual dejará de funcionar.")) return;
+    llamar({ accion: "restablecer", codigo: codigo }, "clientes.php").then(function (r) {
+      if (!r.ok) { aviso(r.error || "No se pudo."); return; }
+      var texto = "Hola " + c.nombre.split(" ")[0] + ", tu contraseña temporal para ingresar a tu cuenta en " + TY.negocio.nombre + " es: " + r.clave + " . Cámbiala en «Mi cuenta» después de ingresar.";
+      prompt("Contraseña temporal de " + c.nombre + " (cópiala y envíasela):", r.clave);
+      if (confirm("¿Enviársela ahora por WhatsApp?")) window.open(wa(c.telefono) + "?text=" + encodeURIComponent(texto), "_blank", "noopener");
+    }).catch(function () { /* sesión */ });
   }
 
   /* =================== Catálogo =================== */
@@ -550,6 +605,8 @@
     });
     ["f-estado", "f-fecha", "f-buscar"].forEach(function (id) { $(id).addEventListener("input", pintarReservas); });
     ["fp-estado", "fp-buscar"].forEach(function (id) { $(id).addEventListener("input", pintarPedidos); });
+    $("fc-buscar").addEventListener("input", pintarClientes);
+    $("lista-clientes").addEventListener("click", function (ev) { var b = ev.target.closest("[data-cl]"); if (b) accionCliente(b); });
     $("lista").addEventListener("click", function (ev) { var b = ev.target.closest("[data-r]"); if (b) accionReserva(b); });
     $("lista-pedidos").addEventListener("click", function (ev) { var b = ev.target.closest("button[data-p]"); if (b) accionPedido(b); });
     $("lista-pedidos").addEventListener("change", function (ev) { if (ev.target.matches("select[data-p]")) accionPedido(ev.target); });

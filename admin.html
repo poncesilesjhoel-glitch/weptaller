@@ -101,6 +101,7 @@
         <nav class="admin-tabs" role="tablist" aria-label="Secciones del panel">
           <button type="button" role="tab" data-tab="reservas" aria-selected="true">Reservas <span class="tab-n" id="n-reservas"></span></button>
           <button type="button" role="tab" data-tab="pedidos" aria-selected="false">Pedidos <span class="tab-n" id="n-pedidos"></span></button>
+          <button type="button" role="tab" data-tab="clientes" aria-selected="false">Clientes <span class="tab-n" id="n-clientes"></span></button>
           <button type="button" role="tab" data-tab="catalogo" aria-selected="false">Catálogo</button>
           <button type="button" role="tab" data-tab="servicios" aria-selected="false">Servicios y agenda</button>
           <button type="button" role="tab" data-tab="pagos" aria-selected="false">Pagos</button>
@@ -152,6 +153,18 @@
             </div>
           </div>
           <div class="reservas-lista" id="lista-pedidos" aria-live="polite"></div>
+        </div>
+
+        <!-- Clientes -->
+        <div class="admin-sec" data-sec="clientes" role="tabpanel" hidden>
+          <div class="stats" id="stats-clientes"></div>
+          <div class="admin-barra">
+            <div class="admin-filtros">
+              <div class="campo"><label for="fc-buscar">Buscar cliente</label><input id="fc-buscar" type="search" placeholder="Nombre, correo o teléfono…"></div>
+            </div>
+          </div>
+          <p class="ayuda-admin">Son los compradores que crearon su cuenta en <code>cuenta.html</code>. Si alguien olvida su contraseña, pulsa «Clave temporal» y envíasela por WhatsApp; luego podrá cambiarla en «Mi cuenta».</p>
+          <div class="reservas-lista" id="lista-clientes" aria-live="polite"></div>
         </div>
 
         <!-- Catálogo -->
@@ -243,6 +256,7 @@
           <li><a href="index.html#servicios">Servicios</a></li>
           <li><a href="index.html#tienda">Tienda</a></li>
           <li><a href="reservar.html">Reservar revisión</a></li>
+          <li><a href="cuenta.html">Mi cuenta</a></li>
           <li><a href="index.html#contacto">Contacto</a></li>
         </ul>
       </div>
@@ -267,7 +281,7 @@
     </div>
     <div class="footer__base">
       <span>© <span data-anio>2026</span> <span data-cfg="negocio.nombre">AUTOMAX</span>. Todos los derechos reservados.</span>
-      <span>Pagos seguros con QR y tarjeta (dLocal Go).</span>
+      <span>Pagos seguros con QR y tarjeta (dLocal Go). · <a href="admin.html" rel="nofollow">Administración</a></span>
     </div>
   </div>
 </footer>

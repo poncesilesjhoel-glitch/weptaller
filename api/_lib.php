@@ -86,7 +86,7 @@ function bd(): ?PDO {
         ltrim($u['path'] ?? '', '/'), $q['sslmode'] ?? 'prefer');
     try {
         $pdo = new PDO($dsn, urldecode($u['user'] ?? ''), urldecode($u['pass'] ?? ''), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-        foreach (['torke_reservas', 'torke_pedidos'] as $t) {
+        foreach (['torke_reservas', 'torke_pedidos', 'torke_clientes'] as $t) {
             $pdo->exec("CREATE TABLE IF NOT EXISTS $t (
                 id BIGSERIAL, codigo TEXT PRIMARY KEY, datos JSONB NOT NULL,
                 creada TIMESTAMPTZ NOT NULL DEFAULT now(), actualizada TIMESTAMPTZ NOT NULL DEFAULT now())");
@@ -108,13 +108,13 @@ function asegurarDirDatos(): void {
    Colecciones: reservas y pedidos
    --------------------------------------------------------------------- */
 function conColeccion(string $nombre, callable $fn, bool $escribir = false) {
-    if (!in_array($nombre, ['reservas', 'pedidos'], true)) throw new InvalidArgumentException($nombre);
+    if (!in_array($nombre, ['reservas', 'pedidos', 'clientes'], true)) throw new InvalidArgumentException($nombre);
     $tabla = 'torke_' . $nombre;
     $pdo = bd();
     if ($pdo) {
         try {
             $pdo->beginTransaction();
-            if ($escribir) $pdo->query('SELECT pg_advisory_xact_lock(' . ($nombre === 'reservas' ? 7421001 : 7421002) . ')');
+            if ($escribir) $pdo->query('SELECT pg_advisory_xact_lock(' . (['reservas' => 7421001, 'pedidos' => 7421002, 'clientes' => 7421003][$nombre]) . ')');
             $lista = [];
             foreach ($pdo->query("SELECT datos FROM $tabla ORDER BY id") as $f) $lista[] = json_decode($f['datos'], true);
             $antes = array_column($lista, 'codigo');
@@ -342,6 +342,40 @@ function sesionDesdeToken(string $t): ?array {
     $d = json_decode((string)base64_decode(strtr($cuerpo, '-_', '+/')), true);
     if (!is_array($d) || ($d['exp'] ?? 0) < time()) return null;
     return $d;
+}
+
+/* ---------------------------------------------------------------------
+   Cuentas de clientes (compradores)
+   Token propio, firmado con un secreto distinto al del panel admin:
+   un token de cliente nunca sirve para entrar al panel.
+   --------------------------------------------------------------------- */
+function secretoClientes(): string {
+    $s = (string)ajuste('secretoClientes', '');
+    if ($s === '') { $s = bin2hex(random_bytes(32)); guardarAjuste('secretoClientes', $s); }
+    return $s;
+}
+
+function tokenCliente(array $c): string {
+    $cuerpo = rtrim(strtr(base64_encode(json_encode(['k' => $c['codigo'], 'v' => substr(hash('sha256', (string)$c['hash']), 0, 12), 'exp' => time() + 30 * 86400])), '+/', '-_'), '=');
+    return $cuerpo . '.' . hash_hmac('sha256', 'cliente|' . $cuerpo, secretoClientes());
+}
+
+/** Cliente con sesión iniciada (cabecera X-Cliente) o null. */
+function clienteActual(): ?array {
+    $t = (string)($_SERVER['HTTP_X_CLIENTE'] ?? '');
+    if ($t === '' || strpos($t, '.') === false) return null;
+    [$cuerpo, $firma] = explode('.', $t, 2);
+    if (!hash_equals(hash_hmac('sha256', 'cliente|' . $cuerpo, secretoClientes()), $firma)) return null;
+    $d = json_decode((string)base64_decode(strtr($cuerpo, '-_', '+/')), true);
+    if (!is_array($d) || ($d['exp'] ?? 0) < time()) return null;
+    $c = buscarRegistro('clientes', (string)$d['k']);
+    if (!$c || empty($c['activo']) || substr(hash('sha256', (string)$c['hash']), 0, 12) !== ($d['v'] ?? '')) return null;
+    return $c;
+}
+
+function clientePublico(array $c): array {
+    return ['codigo' => $c['codigo'], 'nombre' => $c['nombre'], 'correo' => $c['correo'], 'telefono' => $c['telefono'],
+        'direccion' => $c['direccion'] ?? '', 'creada' => $c['creada'] ?? ''];
 }
 
 function verificarSesion(array $in = []): array {

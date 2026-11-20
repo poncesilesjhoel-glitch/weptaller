@@ -183,7 +183,21 @@
     document.getElementById("carrito-vaciar").hidden = si;
     document.getElementById("carrito-finalizar").textContent = si ? "Confirmar pedido y pagar" : "Finalizar pedido";
     document.getElementById("checkout-msg").innerHTML = "";
-    if (si) document.getElementById("ck-nombre").focus();
+    if (si) {
+      var f = document.getElementById("checkout");
+      var d = TY.cliente && TY.cliente.token() ? TY.cliente.datos() : null;
+      var aviso = document.getElementById("ck-cuenta");
+      if (d) {
+        if (!f.nombre.value) f.nombre.value = d.nombre || "";
+        if (!f.telefono.value) f.telefono.value = d.telefono || "";
+        if (!f.correo.value) f.correo.value = d.correo || "";
+        if (!f.direccion.value && d.direccion) f.direccion.value = d.direccion;
+        aviso.innerHTML = "Comprando como <b>" + TY.escapar(d.nombre) + "</b>. El pedido quedará en <a href=\"cuenta.html\">Mi cuenta</a>.";
+      } else {
+        aviso.innerHTML = '¿Tienes cuenta? <a href="cuenta.html?volver=index.html%23tienda">Ingresa</a> o <a href="cuenta.html?modo=registro&amp;volver=index.html%23tienda">créala</a> para seguir tus pedidos. También puedes comprar sin cuenta.';
+      }
+      (d ? document.getElementById("carrito-finalizar") : document.getElementById("ck-nombre")).focus();
+    }
   }
 
   function confirmarPedido() {

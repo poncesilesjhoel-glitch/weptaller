@@ -49,6 +49,8 @@ switch ($accion) {
             'entrega' => $entrega, 'direccion' => $entrega === 'envio' ? $direccion : '', 'nota' => textoLargo($in['nota'] ?? '', 500),
             'estado' => 'pendiente', 'pagado' => false, 'pagoReportado' => false, 'creada' => date('c'),
         ];
+        $cli = clienteActual();
+        if ($cli) $pedido['clienteId'] = $cli['codigo'];
         conPedidos(function (array &$l) use (&$pedido) {
             $pedido['codigo'] = codigoNuevo('PD-', array_column($l, 'codigo'));
             $l[] = $pedido;
